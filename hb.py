@@ -56,6 +56,8 @@ class HummingBirdGui(QWidget):
         self.infoBoard = QFrame()
         self.infoLayout = QVBoxLayout()
         self.aboutLabel = QLabel()
+        # keys
+        self.save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
         # go!
         self.init_ui()
 
@@ -248,12 +250,16 @@ class HummingBirdGui(QWidget):
 
     def setup_app(self):
         self.setup_icon()
+        self.bind_shortcuts()
         self.setGeometry(300, 300, 800, 600)
         self.setWindowTitle(self.version.app_name())
 
     def setup_icon(self):
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'ico' + os.path.sep + 'icon.png'))
+
+    def bind_shortcuts(self):
+        self.save_shortcut.activated.connect(self.action_save)
 
     def init_ui(self):
         self.prepare_book()
