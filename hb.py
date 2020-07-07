@@ -1,6 +1,7 @@
 import sys
+import os
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 
 from PyQt5.QtCore import (
     QSize, QTimer
@@ -238,8 +239,13 @@ class HummingBirdGui(QWidget):
         self.setLayout(self.appLayout)
 
     def setup_app(self):
+        self.setup_icon()
         self.setGeometry(300, 300, 800, 600)
         self.setWindowTitle(self.version.app_name())
+
+    def setup_icon(self):
+        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'ico' + os.path.sep + 'icon.png'))
 
     def init_ui(self):
         self.prepare_book()
