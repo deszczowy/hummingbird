@@ -6,15 +6,20 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import (
     QSize, QTimer
 )
+
+from PyQt5.QtGui import QKeySequence
+
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QFrame, QMessageBox,
     QHBoxLayout, QVBoxLayout,
-    QTextEdit, QPushButton, QLabel
+    QTextEdit, QPushButton, QLabel,
+    QShortcut
 )
 
 from hb_notes import Notes
 from hb_version import VersionInfo
 from hb_enums import ActivePanel
+from hb_style import Stylist
 
 class HummingBirdGui(QWidget):
 
@@ -27,6 +32,7 @@ class HummingBirdGui(QWidget):
         # backend
         self.notes = Notes()
         self.version = VersionInfo()
+        self.stylist = Stylist()
         self.activePanel = ActivePanel.Nothing
         # app
         self.appLayout = QVBoxLayout()
@@ -136,6 +142,7 @@ class HummingBirdGui(QWidget):
         self.mainPage.setContentsMargins(0, 0, 0, 0)
         self.sideNotes.setContentsMargins(0, 0, 0, 0)
         self.sideNotes.setFixedWidth(300)
+        self.sideNotes.setStyleSheet(self.stylist.get_side_notes_style_sheet())
         self.desktop.setContentsMargins(0, 0, 0, 0)
         self.binding.setContentsMargins(0, 0, 0, 0)
         self.binding.setSpacing(0)
@@ -169,6 +176,7 @@ class HummingBirdGui(QWidget):
         self.statusLayout.setContentsMargins(0, 0, 0, 0)
         self.statusLayout.addSpacing(0)
         self.statusBoard.setLayout(self.statusLayout)
+        self.statusBoard.setStyleSheet(self.stylist.get_status_board_style_sheet())
 
     # status slots
     def setup_switch_buttons(self):
@@ -257,10 +265,9 @@ class HummingBirdGui(QWidget):
     # }
 
 def main():
-    stylesheet = "QWidget{margin:0px; padding:0px; border:0px;} QTextEdit{border:0px; border-left:1px dashed red} QPushButton{border: 0px; font-size:10px; color: silver;}"
 
     app = QApplication(sys.argv)
-    app.setStyleSheet(stylesheet)
+    app.setStyleSheet(Stylist().get_style_sheet())
 
     gui = HummingBirdGui()
     gui.show()
