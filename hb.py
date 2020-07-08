@@ -7,7 +7,7 @@ from PyQt5.QtCore import (
     QSize, QTimer
 )
 
-from PyQt5.QtGui import QKeySequence
+from PyQt5.QtGui import QKeySequence, QPixmap
 
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QFrame, QMessageBox,
@@ -54,8 +54,9 @@ class HummingBirdGui(QWidget):
         self.optionsBoard = QFrame()
         # - info board
         self.infoBoard = QFrame()
-        self.infoLayout = QVBoxLayout()
+        self.infoLayout = QHBoxLayout()
         self.aboutLabel = QLabel()
+        self.iconLabel = QLabel()
         # keys
         self.save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
         # go!
@@ -216,7 +217,20 @@ class HummingBirdGui(QWidget):
         self.switchLayout.setSpacing(0)
 
     def set_info_panel(self):
-        self.aboutLabel.setText("About")
+        self.iconLabel.setFixedWidth(50)
+        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        myPixmap = QtGui.QPixmap(scriptDir + os.path.sep + 'ico' + os.path.sep + 'icon.png')
+        myScaledPixmap = myPixmap.scaled(self.iconLabel.size(), QtCore.Qt.KeepAspectRatio)
+        self.iconLabel.setPixmap(myScaledPixmap)
+
+        self.aboutLabel.setText("""
+        This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
+        Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
+        """
+        )
+        self.aboutLabel.setOpenExternalLinks(True)
+        self.aboutLabel.setWordWrap(True)
+        self.infoLayout.addWidget(self.iconLabel)
         self.infoLayout.addWidget(self.aboutLabel)
         self.infoBoard.setLayout(self.infoLayout)
 
