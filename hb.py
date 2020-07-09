@@ -20,6 +20,7 @@ from hb_notes import Notes
 from hb_version import VersionInfo
 from hb_enums import ActivePanel
 from hb_style import Stylist
+from hb_dir import Directory
 
 class HummingBirdGui(QWidget):
 
@@ -33,6 +34,7 @@ class HummingBirdGui(QWidget):
         self.notes = Notes()
         self.version = VersionInfo()
         self.stylist = Stylist()
+        self.directory = Directory()
         self.activePanel = ActivePanel.Nothing
         # app
         self.appLayout = QVBoxLayout()
@@ -58,7 +60,13 @@ class HummingBirdGui(QWidget):
         self.aboutLabel = QLabel()
         self.iconLabel = QLabel()
         # keys
-        self.save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
+        self.shortcutSave = QShortcut(QKeySequence("Ctrl+S"), self)
+        self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
+        self.shortcutMain = QShortcut(QKeySequence("F2"), self)
+        self.shortcutSide = QShortcut(QKeySequence("F3"), self)
+        self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
+        self.shortcutExit = QShortcut(QKeySequence("F10"), self)
+        self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
         # go!
         self.init_ui()
 
@@ -121,6 +129,16 @@ class HummingBirdGui(QWidget):
             self.infoBoard.setFixedHeight(60)
         elif sender == ActivePanel.Options:
             self.optionsBoard.setFixedHeight(60)
+
+    def action_focus_main(self):
+        self.mainPage.setFocus()
+
+    def action_focus_side(self):
+        self.sideNotes.setFocus()
+
+    def action_terminate(self):
+        self.action_save()
+        self.close()
     # }
 
 
@@ -218,8 +236,8 @@ class HummingBirdGui(QWidget):
 
     def set_info_panel(self):
         self.iconLabel.setFixedWidth(50)
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
-        myPixmap = QtGui.QPixmap(scriptDir + os.path.sep + 'ico' + os.path.sep + 'icon.png')
+        
+        myPixmap = QtGui.QPixmap(self.directory.get_resource_dir() + 'icon.png')
         myScaledPixmap = myPixmap.scaled(self.iconLabel.size(), QtCore.Qt.KeepAspectRatio)
         self.iconLabel.setPixmap(myScaledPixmap)
 
@@ -273,7 +291,20 @@ class HummingBirdGui(QWidget):
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'ico' + os.path.sep + 'icon.png'))
 
     def bind_shortcuts(self):
-        self.save_shortcut.activated.connect(self.action_save)
+        self.shortcutSave.activated.connect(self.action_save)
+        self.shortcutMain.activated.connect(self.action_focus_main)
+        self.shortcutSide.activated.connect(self.action_focus_side)
+        self.shortcutInfo.activated.connect(self.on_info_toggle)
+        self.shortcutSetup.activated.connect(self.on_settings_toggle)
+        self.shortcutHide.activated.connect(self.hide_all_panels)
+        self.shortcutExit.activated.connect(self.action_terminate)
+
+    def center(self):
+        geometry = self.frameGeometry()
+        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        geometry.moveCenter(centerPoint)
+        self.move(geometry.topLeft())
 
     def init_ui(self):
         self.prepare_book()
@@ -282,6 +313,7 @@ class HummingBirdGui(QWidget):
         self.stack_gui_elements()
         self.setup_app()
         self.prepare_timers()
+        self.center()
     # }
 
 def main():
