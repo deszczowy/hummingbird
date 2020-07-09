@@ -12,7 +12,7 @@ from PyQt5.QtGui import QKeySequence, QPixmap
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QFrame, QMessageBox,
     QHBoxLayout, QVBoxLayout,
-    QTextEdit, QPushButton, QLabel,
+    QTextEdit, QPushButton, QLabel, QSpinBox,
     QShortcut
 )
 
@@ -54,6 +54,9 @@ class HummingBirdGui(QWidget):
         self.switchLayout = QVBoxLayout()
         # - settings board
         self.optionsBoard = QFrame()
+        self.fontSizeLabel = QLabel()
+        self.fontSizeValue = QSpinBox()
+        self.optionsLayout = QHBoxLayout()
         # - info board
         self.infoBoard = QFrame()
         self.infoLayout = QHBoxLayout()
@@ -69,7 +72,7 @@ class HummingBirdGui(QWidget):
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
         # go!
         self.init_ui()
-        print("Start")
+        #print("Start")
 
 
 
@@ -170,6 +173,8 @@ class HummingBirdGui(QWidget):
         self.binding.setSpacing(0)
     
     def stack_book_elements(self):
+        self.mainPage.setFontPointSize(13)
+        self.sideNotes.setFontPointSize(13)
         self.binding.addWidget(self.mainPage)
         self.binding.addWidget(self.sideNotes)
         self.desktop.setLayout(self.binding)
@@ -229,6 +234,7 @@ class HummingBirdGui(QWidget):
     def prepare_settings_board(self):
         self.set_settings_margins()
         self.set_info_panel()
+        self.set_settings_panel()
         self.stack_settings_elements()
 
     def set_settings_margins(self):
@@ -252,6 +258,37 @@ class HummingBirdGui(QWidget):
         self.infoLayout.addWidget(self.iconLabel)
         self.infoLayout.addWidget(self.aboutLabel)
         self.infoBoard.setLayout(self.infoLayout)
+
+    def set_settings_panel(self):
+        self.fontSizeLabel.setText("Font size")
+        self.fontSizeLabel.setAlignment(QtCore.Qt.AlignRight)
+        self.fontSizeLabel.setFixedHeight(20)
+        self.fontSizeLabel.setFixedWidth(100)
+
+        self.fontSizeValue.setMinimum(6)
+        self.fontSizeValue.setMaximum(100)
+        self.fontSizeValue.setValue(13)
+        self.fontSizeValue.setFixedHeight(30)
+        self.fontSizeValue.setFixedWidth(70)
+        self.fontSizeValue.valueChanged.connect(self.on_font_size_change)
+
+        self.optionsLayout.addWidget(self.fontSizeLabel)
+        self.optionsLayout.addWidget(self.fontSizeValue)
+        self.optionsBoard.setLayout(self.optionsLayout)
+
+    def on_font_size_change(self):
+        mainPageTextCursor = self.mainPage.textCursor()
+        sideNoteTextCursor = self.sideNotes.textCursor()
+        mainPageModified = self.mainPage.document().isModified()
+        sideNoteModified = self.sideNotes.document().isModified()
+        self.mainPage.selectAll()
+        self.mainPage.setFontPointSize(self.fontSizeValue.value())
+        self.mainPage.setTextCursor(mainPageTextCursor)
+        self.mainPage.document().setModified(mainPageModified)
+        self.sideNotes.selectAll()
+        self.sideNotes.setFontPointSize(self.fontSizeValue.value())
+        self.sideNotes.setTextCursor(sideNoteTextCursor)
+        self.sideNotes.document().setModified(sideNoteModified)
 
     def stack_settings_elements(self):
         self.switchLayout.addWidget(self.optionsBoard)
