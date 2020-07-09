@@ -69,6 +69,7 @@ class HummingBirdGui(QWidget):
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
         # go!
         self.init_ui()
+        print("Start")
 
 
 
@@ -287,8 +288,7 @@ class HummingBirdGui(QWidget):
         self.setWindowTitle(self.version.app_name())
 
     def setup_icon(self):
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
-        self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'ico' + os.path.sep + 'icon.png'))
+        self.setWindowIcon(QtGui.QIcon(self.directory.get_resource_dir() + 'icon.png'))
 
     def bind_shortcuts(self):
         self.shortcutSave.activated.connect(self.action_save)

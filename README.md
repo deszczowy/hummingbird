@@ -1,6 +1,10 @@
 # hummingbird
 Little notebook
 
+## Features
+
+- Window contains main editor and special space for side notes
+- Autosave
 
 ## Keys
 
@@ -12,3 +16,5 @@ Available shortcuts are listed below:
 - `F9`: show settings panel
 - `F10`: quit application with all notes saved
 - `ESC`: hide bottom panels
+
+- `Ctrl+S`: Save all notes
