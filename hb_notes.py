@@ -1,4 +1,5 @@
 from hb_dir import Directory
+from hb_db import Database
 
 class Notes():
     
@@ -29,3 +30,15 @@ class Notes():
     
     def saveSideNotes(self, content):
         self.saveToFile(self.sideNotes, content)
+
+    def saveMainNotesToDb(self, content):
+        Database().save_notebook(content, False)
+    
+    def saveSideNotesToDb(self, content):
+        Database().save_notebook(content, True)
+
+    def getSideNotesFromDb(self):
+        return Database().get_side_content()
+
+    def getMainNotesFromDb(self):
+        return Database().get_main_content()

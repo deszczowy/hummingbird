@@ -21,6 +21,7 @@ from hb_version import VersionInfo
 from hb_enums import ActivePanel
 from hb_style import Stylist
 from hb_dir import Directory
+from hb_db import Database
 
 class HummingBirdGui(QWidget):
 
@@ -102,12 +103,12 @@ class HummingBirdGui(QWidget):
         saved = False
 
         if self.mainPage.document().isModified():
-            self.notes.saveMainNotes(self.mainPage.toPlainText())
+            self.notes.saveMainNotesToDb(self.mainPage.toPlainText())
             self.mainPage.document().setModified(False)
             saved = True
 
         if self.sideNotes.document().isModified():
-            self.notes.saveSideNotes(self.sideNotes.toPlainText())
+            self.notes.saveSideNotesToDb(self.sideNotes.toPlainText())
             self.sideNotes.document().setModified(False)
             saved = True
         
@@ -180,8 +181,8 @@ class HummingBirdGui(QWidget):
         self.desktop.setLayout(self.binding)
     
     def load_notes_contents(self):
-        self.mainPage.setPlainText(self.notes.getMainNotes())
-        self.sideNotes.setPlainText(self.notes.getSideNotes())
+        self.mainPage.setPlainText(self.notes.getMainNotesFromDb())
+        self.sideNotes.setPlainText(self.notes.getSideNotesFromDb())
     # }
 
 
@@ -355,6 +356,7 @@ class HummingBirdGui(QWidget):
 
 def main():
 
+    Database().create()
     app = QApplication(sys.argv)
     app.setStyleSheet(Stylist().get_style_sheet())
 
