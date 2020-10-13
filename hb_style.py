@@ -8,12 +8,12 @@ class Stylist():
 
     def get_side_notes_style_sheet(self):
         return """
-            border-left: .1em dashed silver;
+            border-left: .05em dashed silver;
         """
 
     def get_status_board_style_sheet(self):
         return """
             .QFrame {
-                border-top: 2px dashed silver; 
+                border-top: .05em dashed silver; 
             }
         """

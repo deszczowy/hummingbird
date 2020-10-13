@@ -16,3 +16,10 @@ class Directory():
 
     def get_resource_dir(self):
         return self.root + os.path.sep + self.resource + os.path.sep
+
+    def get_file_content(self, path):
+        content = ""
+        with open(path, 'a+') as _file:
+            _file.seek(0)
+            content = _file.read() 
+        return content
