@@ -1,31 +1,17 @@
-from hb_dir import Directory
+import os.path
+
+from hb_db import Database
 
 class Notes():
     
-    def __init__(self):
-        self.notesDir = Directory().get_notes_dir()
-        self.mainNotes = self.notesDir + "mnote.x"
-        self.sideNotes = self.notesDir + "snote.x"
-        
-    def getFileContent(self, path):
-        content = ""
-        with open(path, 'a+') as _file:
-            _file.seek(0)
-            content = _file.read() 
-        return content
-
-    def getMainNotes(self):
-        return self.getFileContent(self.mainNotes)
+    def save_main_notes_to_db(self, content):
+        Database().save_notebook(content, False)
     
-    def getSideNotes(self):
-        return self.getFileContent(self.sideNotes)
+    def save_side_notes_to_db(self, content):
+        Database().save_notebook(content, True)
 
-    def saveToFile(self, path, content):
-        with open(path, "w+") as _file:
-            _file.write(content)
+    def get_side_notes_from_db(self):
+        return Database().get_side_content()
 
-    def saveMainNotes(self, content):
-        self.saveToFile(self.mainNotes, content)
-    
-    def saveSideNotes(self, content):
-        self.saveToFile(self.sideNotes, content)
+    def get_main_notes_from_db(self):
+        return Database().get_main_content()

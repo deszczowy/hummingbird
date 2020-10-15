@@ -1,3 +1,5 @@
+#from PyQt5 import QtWidgets
+
 import sys
 import os
 
@@ -10,22 +12,28 @@ from PyQt5.QtCore import (
 from PyQt5.QtGui import QKeySequence, QPixmap
 
 from PyQt5.QtWidgets import (
-    QApplication, QWidget, QFrame, QMessageBox,
+    QApplication, QMainWindow, QWidget, QFrame, QMessageBox,
     QHBoxLayout, QVBoxLayout,
     QTextEdit, QPushButton, QLabel, QSpinBox,
-    QShortcut
+    QShortcut, QDesktopWidget
 )
 
 from hb_notes import Notes
 from hb_version import VersionInfo
 from hb_enums import ActivePanel
-from hb_style import Stylist
+
 from hb_dir import Directory
 
-class HummingBirdGui(QWidget):
+from hb_db import Database
+from hb_style import Stylist
 
-    def __init__(self):
-        super().__init__()
+class MainWindow(QMainWindow):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.hMainWindow = QFrame()
+
         # timer
         self.tic = 0
         self.timer = QTimer(self)
@@ -102,12 +110,12 @@ class HummingBirdGui(QWidget):
         saved = False
 
         if self.mainPage.document().isModified():
-            self.notes.saveMainNotes(self.mainPage.toPlainText())
+            self.notes.save_main_notes_to_db(self.mainPage.toPlainText())
             self.mainPage.document().setModified(False)
             saved = True
 
         if self.sideNotes.document().isModified():
-            self.notes.saveSideNotes(self.sideNotes.toPlainText())
+            self.notes.save_side_notes_to_db(self.sideNotes.toPlainText())
             self.sideNotes.document().setModified(False)
             saved = True
         
@@ -180,8 +188,8 @@ class HummingBirdGui(QWidget):
         self.desktop.setLayout(self.binding)
     
     def load_notes_contents(self):
-        self.mainPage.setPlainText(self.notes.getMainNotes())
-        self.sideNotes.setPlainText(self.notes.getSideNotes())
+        self.mainPage.setPlainText(self.notes.get_main_notes_from_db())
+        self.sideNotes.setPlainText(self.notes.get_side_notes_from_db())
     # }
 
 
@@ -252,7 +260,7 @@ class HummingBirdGui(QWidget):
         This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
         Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
         """
-        )
+        )        
         self.aboutLabel.setOpenExternalLinks(True)
         self.aboutLabel.setWordWrap(True)
         self.infoLayout.addWidget(self.iconLabel)
@@ -316,13 +324,25 @@ class HummingBirdGui(QWidget):
         self.appLayout.addWidget(self.desktop)
         self.appLayout.addWidget(self.statusBoard)
         self.appLayout.addWidget(self.switchBoard)
-        self.setLayout(self.appLayout)
+        self.hMainWindow.setLayout(self.appLayout)
 
     def setup_app(self):
         self.setup_icon()
         self.bind_shortcuts()
-        self.setGeometry(300, 300, 800, 600)
+        self.setup_window_geometry()
         self.setWindowTitle(self.version.app_name())
+
+    def setup_window_geometry(self):
+        screen = QDesktopWidget().screenGeometry(-1)
+        w = (screen.width() / 3) *2
+        h = (screen.height() / 3) *2
+        if w < 800: 
+            w = 800
+        if h < 600:
+            h = 600        
+        self.setGeometry(0, 0, int(w), int(h))
+        print(w)
+        print(h)
 
     def setup_icon(self):
         self.setWindowIcon(QtGui.QIcon(self.directory.get_resource_dir() + 'icon.png'))
@@ -351,17 +371,21 @@ class HummingBirdGui(QWidget):
         self.setup_app()
         self.prepare_timers()
         self.center()
+        self.setCentralWidget(self.hMainWindow)
     # }
 
 def main():
-
+    Database().create()
     app = QApplication(sys.argv)
     app.setStyleSheet(Stylist().get_style_sheet())
+    w = MainWindow()
+    w.show()
+    app.exec()
 
-    gui = HummingBirdGui()
-    gui.show()
+    #gui = HummingBirdGui()
+    
 
-    sys.exit(app.exec_())
+    #sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()
