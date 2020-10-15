@@ -5,8 +5,8 @@
 + prepare code for building exe files
 + create roadmap
 + save notes to database instead of files
-- window width on start - half of screen width, no less than 800px
-- window height on start, no less than 600px
++ window width on start - 2/3 of screen width, no less than 800px
++ window height on start, no less than 600px
 
 ## Version 0.4
 

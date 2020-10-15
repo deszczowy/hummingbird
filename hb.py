@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QFrame, QMessageBox,
     QHBoxLayout, QVBoxLayout,
     QTextEdit, QPushButton, QLabel, QSpinBox,
-    QShortcut
+    QShortcut, QDesktopWidget
 )
 
 from hb_notes import Notes
@@ -325,13 +325,24 @@ class MainWindow(QMainWindow):
         self.appLayout.addWidget(self.statusBoard)
         self.appLayout.addWidget(self.switchBoard)
         self.hMainWindow.setLayout(self.appLayout)
-        #self.setLayout(self.appLayout)
 
     def setup_app(self):
         self.setup_icon()
         self.bind_shortcuts()
-        self.setGeometry(300, 300, 800, 600)
+        self.setup_window_geometry()
         self.setWindowTitle(self.version.app_name())
+
+    def setup_window_geometry(self):
+        screen = QDesktopWidget().screenGeometry(-1)
+        w = (screen.width() / 3) *2
+        h = (screen.height() / 3) *2
+        if w < 800: 
+            w = 800
+        if h < 600:
+            h = 600        
+        self.setGeometry(0, 0, int(w), int(h))
+        print(w)
+        print(h)
 
     def setup_icon(self):
         self.setWindowIcon(QtGui.QIcon(self.directory.get_resource_dir() + 'icon.png'))
