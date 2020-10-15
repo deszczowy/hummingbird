@@ -2,7 +2,7 @@ class VersionInfo():
     
     def __init__(self):
         self.appName = "Hummingbird"
-        self.appVersion = "0.3"
+        self.appVersion = "0.4"
         self.dbVersion = 1
 
     def app_name(self):

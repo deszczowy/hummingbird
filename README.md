@@ -1,6 +1,8 @@
 # hummingbird
 Little notebook
 
+current version 0.4
+
 ## Features
 
 - Window contains main editor and special space for side notes
