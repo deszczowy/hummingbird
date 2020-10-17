@@ -22,6 +22,9 @@ class Database():
         for query in queries:
             sqlQuery.exec_(query)
 
+        dbv = self.get_database_version()
+        print(dbv)
+
     def save_notebook(self, content, side):
         main_indicator = -1
         if side:
@@ -97,4 +100,22 @@ class Database():
         query.exec_("SELECT content FROM notebook WHERE main_page = 0 AND archived = 0")
         while query.next():
             return query.value(0)
+
+    def get_database_version(self):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :GET DBV")
+            return False
+        
+        query = QSqlQuery()
+        query.exec_("SELECT entry FROM dictionary WHERE key = 'db_version'")
+        res = "1"
+        while query.next():
+            res = query.value(0)
+            if res == "":
+                res = "1"
+
+        return int(res)
         
