@@ -43,7 +43,7 @@ class Sql():
         return """
         ALTER TABLE notebook ADD COLUMN topic INT NULL;
         """ + sep + """
-        UPDATE notebook SET topic = 2;
+        UPDATE notebook SET topic = 1;
         """ + sep + """
         UPDATE dictionary SET entry = '3' WHERE key = 'db_version';
         """

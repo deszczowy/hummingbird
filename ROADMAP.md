@@ -3,8 +3,8 @@
 ## Version 0.4
 
 - full readme file with screanshot and changelog
-- database update mechanism, version based, with structure backward compatibility
-- notes entry versioning, access to last 40 or more saves
++ database update mechanism, version based, with structure backward compatibility
++ notes entry versioning, access to last 40 or more saves
 
 ## Version 0.5
 

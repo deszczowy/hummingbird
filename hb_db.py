@@ -43,16 +43,31 @@ class Database():
 
         query = QSqlQuery()
         query.prepare(
-        """INSERT INTO notebook (id, content, version, save_time, main_page, archived) values (
+        """INSERT INTO notebook (id, content, version, save_time, main_page, archived, topic) values (
             (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
             :content,
             (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE main_page = :mpage),
             datetime('now','localtime'),
-            :mpage, 0
+            :mpage, 0, 1
         );""")
                     
         query.bindValue(":content", content)
         query.bindValue(":mpage", main_indicator)
+        query.exec_()
+
+        self.remove_old_versions(main_indicator)
+
+    def remove_old_versions(self, side):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN: REMO")
+            return False
+        
+        query = QSqlQuery()
+        query.prepare("delete from notebook where main_page = :side and version <= (select max(version) from notebook where main_page = :side) -40;")
+        query.bindValue(":side", side)
         query.exec_()
 
     def archive_main_notebook(self):
