@@ -11,7 +11,8 @@ class Sql():
                 version INT NOT NULL,
                 save_time TEXT NOT NULL,
                 main_page INT NOT NULL,
-                archived INT NOT NULL
+                archived INT NOT NULL,
+                topic INT NULL
             );
         """ + sep + """
             CREATE TABLE IF NOT EXISTS defaults (
@@ -29,12 +30,24 @@ class Sql():
                WHERE NOT EXISTS(SELECT 1 FROM defaults WHERE id = 1);
         """ + sep + """
             INSERT INTO dictionary (key, entry) 
-               SELECT 'db_version', '2'
-               WHERE NOT EXISTS(SELECT 1 FROM dictionary WHERE key = 'db_version')
+               SELECT 'db_version', '3'
+               WHERE NOT EXISTS(SELECT 1 FROM dictionary WHERE key = 'db_version');
         """
 
     @staticmethod
     def update_to_2(sep):
+        return """ """ + sep + """ """
+
+    @staticmethod
+    def update_to_3(sep):
         return """
+        ALTER TABLE notebook ADD COLUMN topic INT NULL;
         """ + sep + """
+        UPDATE notebook SET topic = 2;
+        """ + sep + """
+        UPDATE dictionary SET entry = '3' WHERE key = 'db_version';
         """
+
+    @staticmethod
+    def update_to_4(sep):
+        return """ """ + sep + """ """

@@ -2,6 +2,7 @@ from PyQt5.QtSql import (QSqlDatabase, QSqlQuery)
 
 from hb_dir import Directory
 from hb_sql import Sql
+from hb_version import VersionInfo
 
 class Database():
 
@@ -22,8 +23,7 @@ class Database():
         for query in queries:
             sqlQuery.exec_(query)
 
-        dbv = self.get_database_version()
-        print(dbv)
+        self.update()
 
     def save_notebook(self, content, side):
         main_indicator = -1
@@ -119,3 +119,39 @@ class Database():
 
         return int(res)
         
+    def update(self):
+        local_version = self.get_database_version()
+        current_version = VersionInfo.dbVersion
+        difference = current_version - local_version
+
+        separator = Sql.separator
+
+        updaters = {
+            1: Sql.update_to_2(separator),
+            2: Sql.update_to_3(separator),
+            3: Sql.update_to_4(separator)
+        }
+
+        if difference == 1:
+            func = updaters.get(local_version)
+            self.execute(func)
+        else:
+            for version in range(local_version, current_version):
+                func = updaters.get(version)
+                self.execute(func)
+
+    def execute(self, script):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not script == "":
+
+            if not db.open():
+                print("NOT OPEN :EXECUTE")
+                return False
+
+            queries = (script).split(Sql.separator)
+            sqlQuery = QSqlQuery()
+
+            for query in queries:
+                sqlQuery.exec_(query)
