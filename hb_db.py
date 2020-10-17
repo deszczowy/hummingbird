@@ -1,6 +1,7 @@
 from PyQt5.QtSql import (QSqlDatabase, QSqlQuery)
 
 from hb_dir import Directory
+from hb_sql import Sql
 
 class Database():
 
@@ -15,31 +16,11 @@ class Database():
             print("NOT OPEN :CREATE")
             return False
 
-        query = QSqlQuery()
-        query.exec_(
-            '''CREATE TABLE IF NOT EXISTS notebook (
-                id INT PRIMARY KEY NOT NULL,
-                content TEXT NOT NULL,
-                version INT NOT NULL,
-                save_time TEXT NOT NULL,
-                main_page INT NOT NULL,
-                archived INT NOT NULL
-            );'''
-        )
+        queries = Sql.create_db(Sql.separator).split(Sql.separator)
+        sqlQuery = QSqlQuery()
 
-        query.exec_(
-            '''CREATE TABLE IF NOT EXISTS defaults (
-                id INT PRIMARY KEY NOT NULL,
-                version INT NOT NULL
-            );'''
-        )
-
-        query.exec_(
-            '''INSERT INTO defaults (id, version) 
-               SELECT 1, 1 
-               WHERE NOT EXISTS(SELECT 1 FROM defaults WHERE id = 1);
-            '''
-        )
+        for query in queries:
+            sqlQuery.exec_(query)
 
     def save_notebook(self, content, side):
         main_indicator = -1
