@@ -1,18 +1,4 @@
-# Roadmap
-
-## Version 0.3
-
-+ prepare code for building exe files
-+ create roadmap
-+ save notes to database instead of files
-+ window width on start - 2/3 of screen width, no less than 800px
-+ window height on start, no less than 600px
-
-## Version 0.4
-
-- full readme file with screanshot and changelog
-- database update mechanism, version based, with structure backward compatibility
-- notes entry versioning, access to last 40 or more saves
+# Hummingbird Editor Roadmap
 
 ## Version 0.5
 
@@ -37,6 +23,7 @@
 
 - start with system
 - database structure description with information in wich version given table and/or field were introduced
+- deb packages
 
 ## Principles
 

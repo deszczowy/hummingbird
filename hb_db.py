@@ -1,6 +1,8 @@
 from PyQt5.QtSql import (QSqlDatabase, QSqlQuery)
 
 from hb_dir import Directory
+from hb_sql import Sql
+from hb_version import VersionInfo
 
 class Database():
 
@@ -15,31 +17,13 @@ class Database():
             print("NOT OPEN :CREATE")
             return False
 
-        query = QSqlQuery()
-        query.exec_(
-            '''CREATE TABLE IF NOT EXISTS notebook (
-                id INT PRIMARY KEY NOT NULL,
-                content TEXT NOT NULL,
-                version INT NOT NULL,
-                save_time TEXT NOT NULL,
-                main_page INT NOT NULL,
-                archived INT NOT NULL
-            );'''
-        )
+        queries = Sql.create_db(Sql.separator).split(Sql.separator)
+        sqlQuery = QSqlQuery()
 
-        query.exec_(
-            '''CREATE TABLE IF NOT EXISTS defaults (
-                id INT PRIMARY KEY NOT NULL,
-                version INT NOT NULL
-            );'''
-        )
+        for query in queries:
+            sqlQuery.exec_(query)
 
-        query.exec_(
-            '''INSERT INTO defaults (id, version) 
-               SELECT 1, 1 
-               WHERE NOT EXISTS(SELECT 1 FROM defaults WHERE id = 1);
-            '''
-        )
+        self.update()
 
     def save_notebook(self, content, side):
         main_indicator = -1
@@ -59,16 +43,31 @@ class Database():
 
         query = QSqlQuery()
         query.prepare(
-        """INSERT INTO notebook (id, content, version, save_time, main_page, archived) values (
+        """INSERT INTO notebook (id, content, version, save_time, main_page, archived, topic) values (
             (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
             :content,
             (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE main_page = :mpage),
             datetime('now','localtime'),
-            :mpage, 0
+            :mpage, 0, 1
         );""")
                     
         query.bindValue(":content", content)
         query.bindValue(":mpage", main_indicator)
+        query.exec_()
+
+        self.remove_old_versions(main_indicator)
+
+    def remove_old_versions(self, side):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN: REMO")
+            return False
+        
+        query = QSqlQuery()
+        query.prepare("delete from notebook where main_page = :side and version <= (select max(version) from notebook where main_page = :side) -40;")
+        query.bindValue(":side", side)
         query.exec_()
 
     def archive_main_notebook(self):
@@ -116,4 +115,58 @@ class Database():
         query.exec_("SELECT content FROM notebook WHERE main_page = 0 AND archived = 0")
         while query.next():
             return query.value(0)
+
+    def get_database_version(self):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :GET DBV")
+            return False
         
+        query = QSqlQuery()
+        query.exec_("SELECT entry FROM dictionary WHERE key = 'db_version'")
+        res = "1"
+        while query.next():
+            res = query.value(0)
+            if res == "":
+                res = "1"
+
+        return int(res)
+        
+    def update(self):
+        local_version = self.get_database_version()
+        current_version = VersionInfo.dbVersion
+        difference = current_version - local_version
+
+        separator = Sql.separator
+
+        updaters = {
+            1: Sql.update_to_2(separator),
+            2: Sql.update_to_3(separator),
+            3: Sql.update_to_4(separator)
+        }
+
+        if difference == 1:
+            func = updaters.get(local_version)
+            self.execute(func)
+        else:
+            for version in range(local_version, current_version):
+                func = updaters.get(version)
+                self.execute(func)
+
+    def execute(self, script):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not script == "":
+
+            if not db.open():
+                print("NOT OPEN :EXECUTE")
+                return False
+
+            queries = (script).split(Sql.separator)
+            sqlQuery = QSqlQuery()
+
+            for query in queries:
+                sqlQuery.exec_(query)
