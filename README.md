@@ -1,16 +1,27 @@
-# hummingbird
-Little notebook
+<img src="/res/icon.png" alt="hb_icon" width="100"/>
 
-current version 0.4
+# Hummingbird Editor
+
+This is a little notebook, with two visible editors. First one for main long notes. Second one for easy accessible additional side notes.
+
+Current version is `0.4`
+
+![Hummingbird main window](/res/screenshot.png)
+
+## How to run
+
+You can run Hummingbird by downloading this repository and go with `python3 hb.py` command in root directory. For now. Windows and Linux executables are planned for next releases.
 
 ## Features
 
-- Window contains main editor and special space for side notes
+In this version there are two main features:
+
+- Two visible editors
 - Autosave
 
-## Keys
+## Keyboard shortcuts
 
-Available shortcuts are listed below:
+You can work with Hummingbird using only keyboard. Available shortcuts are listed below:
 
 - `F1`: show info panel
 - `F2`: focus on main note
@@ -18,5 +29,17 @@ Available shortcuts are listed below:
 - `F9`: show settings panel
 - `F10`: quit application with all notes saved
 - `ESC`: hide bottom panels
-
 - `Ctrl+S`: Save all notes
+
+## Development
+
+To organize development of this app I prepared simple roadmap document. It is available [here](ROADMAP.md)
+
+## Credits
+
+The beautiful Hummingbird logo is made by [Freepik](https://www.flaticon.com/authors/freepik) and came from [flaticon.com]("http://www.flaticon.com) site.
+
+## Changelog
+
+#### Ver. 0.4
+- Last 40 saves are stored in database

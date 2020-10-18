@@ -1,10 +1,4 @@
-# Roadmap
-
-## Version 0.4
-
-- full readme file with screanshot and changelog
-+ database update mechanism, version based, with structure backward compatibility
-+ notes entry versioning, access to last 40 or more saves
+# Hummingbird Editor Roadmap
 
 ## Version 0.5
 
@@ -29,6 +23,7 @@
 
 - start with system
 - database structure description with information in wich version given table and/or field were introduced
+- deb packages
 
 ## Principles
 
