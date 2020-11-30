@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import (
 
 from hb_notes import Notes
 from hb_version import VersionInfo
-from hb_enums import ActivePanel
+from hb_enums import (ActivePanel, EditorMode)
 
 from hb_dir import Directory
 
@@ -33,7 +33,8 @@ class MainWindow(QMainWindow):
         super().__init__(*args, **kwargs)
 
         self.hMainWindow = QFrame()
-
+        self.marginWidth = 0
+        self.editorMode = EditorMode.Normal
         # timer
         self.tic = 0
         self.timer = QTimer(self)
@@ -75,6 +76,8 @@ class MainWindow(QMainWindow):
         self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
         self.shortcutMain = QShortcut(QKeySequence("F2"), self)
         self.shortcutSide = QShortcut(QKeySequence("F3"), self)
+        self.shortcutNormal = QShortcut(QKeySequence("F7"), self)
+        self.shortcutFocus = QShortcut(QKeySequence("F8"), self)
         self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
         self.shortcutExit = QShortcut(QKeySequence("F10"), self)
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
@@ -82,7 +85,30 @@ class MainWindow(QMainWindow):
         self.init_ui()
         #print("Start")
 
+    # editor modes {
+    def switch_editor_mode_to_focus(self):
+        self.editorMode = EditorMode.Focus
+        self.set_focus_mode_margins()
+    
+    def switch_editor_mode_to_normal(self):
+        self.editorMode = EditorMode.Normal
+        self.mainPage.setViewportMargins(0, 0, 0, 0)
+        self.marginWidth = 0
 
+    def set_focus_mode_margins(self):
+        margin = self.width() - self.sideNotes.width() - 750
+        margin = round(margin / 2)
+
+        if margin < 0:
+            margin = 0
+        if margin != self.marginWidth:
+            self.mainPage.setViewportMargins(margin, 20, margin, 20)
+            self.marginWidth = margin
+    # }
+
+    def resizeEvent(self, event):
+        if self.editorMode == EditorMode.Focus:
+            self.set_focus_mode_margins()
 
 
     # timers {
@@ -355,6 +381,8 @@ class MainWindow(QMainWindow):
         self.shortcutSetup.activated.connect(self.on_settings_toggle)
         self.shortcutHide.activated.connect(self.hide_all_panels)
         self.shortcutExit.activated.connect(self.action_terminate)
+        self.shortcutNormal.activated.connect(self.switch_editor_mode_to_normal)
+        self.shortcutFocus.activated.connect(self.switch_editor_mode_to_focus)
 
     def center(self):
         geometry = self.frameGeometry()
