@@ -425,6 +425,7 @@ class MainWindow(QMainWindow):
         self.move(geometry.topLeft())
 
     def init_ui(self):
+        self.setMinimumSize(800, 600)
         self.prepare_book()
         self.prepare_status_board()
         self.prepare_settings_board()
