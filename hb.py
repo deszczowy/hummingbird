@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
         self.infoBoard = QFrame()
         self.infoLayout = QHBoxLayout()
         self.aboutLabel = QLabel()
+        self.shortcutInfoLabel = QLabel()
         self.iconLabel = QLabel()
         # keys
         self.shortcutSave = QShortcut(QKeySequence("Ctrl+S"), self)
@@ -288,7 +289,7 @@ class MainWindow(QMainWindow):
         This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
         Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
         """
-        )        
+        )
         self.aboutLabel.setOpenExternalLinks(True)
         self.aboutLabel.setWordWrap(True)
         self.infoLayout.addWidget(self.iconLabel)
@@ -347,11 +348,20 @@ class MainWindow(QMainWindow):
         self.stack_status_elements()
         self.stack_settings_elements()
 
+        self.shortcutInfoLabel.setText("""
+        <p style="line-height:0px; font-size:10px; font-family:mono; width:100%; text-align:center; color:silver;">
+        [F1 info]             [F9 settings]         [ESC hide panels]  
+        [F10 save and quit]   [F2 main note]        [F3 side note] 
+        [Ctrl+S save all]
+        </p>
+        """)   
+
         self.appLayout.setContentsMargins(0, 0, 0, 0)
         self.appLayout.setSpacing(0)
         self.appLayout.addWidget(self.desktop)
         self.appLayout.addWidget(self.statusBoard)
         self.appLayout.addWidget(self.switchBoard)
+        self.appLayout.addWidget(self.shortcutInfoLabel)
         self.hMainWindow.setLayout(self.appLayout)
 
     def setup_app(self):
