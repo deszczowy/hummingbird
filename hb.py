@@ -357,14 +357,12 @@ class MainWindow(QMainWindow):
     def setup_app(self):
         self.setup_icon()
         self.bind_shortcuts()
-        self.setup_window_geometry()
         self.setWindowTitle(self.version.app_name())
-
-    def setup_window_size(self):
-        if int(Database().get_value("window_width", "-1")) == -1 or int(Database().get_value("window_height", "-1")):
-            self.setup_default_window_geometry()
+        self.setup_window_geometry()
+        if int(Database().get_value("window_max", "0")) == 1:
+            self.showMaximized()
         else:
-            self.setup_window_geometry()
+            self.showNormal()
 
     def setup_window_geometry(self):
         x = int(Database().get_value("window_left", "-1"))
@@ -411,11 +409,14 @@ class MainWindow(QMainWindow):
         self.shortcutFocus.activated.connect(self.switch_editor_mode_to_focus)
 
     def save_window_position(self):
-        geometry = self.frameGeometry()
-        Database().store_value("window_left", geometry.x())
-        Database().store_value("window_top", geometry.y())
-        Database().store_value("window_width", geometry.width())
-        Database().store_value("window_height", geometry.height())
+        if not self.isMaximized():
+            geometry = self.frameGeometry()
+            Database().store_value("window_left", geometry.x())
+            Database().store_value("window_top", geometry.y())
+            Database().store_value("window_width", geometry.width())
+            Database().store_value("window_height", geometry.height())
+        maximized = "1" if self.isMaximized() else "0"
+        Database().store_value("window_max", maximized)
 
     def center(self):
         geometry = self.frameGeometry()
