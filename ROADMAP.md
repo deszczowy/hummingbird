@@ -9,15 +9,21 @@
 
 - build executables, compiled version available to download
 - dark mode. 
+- focus mode
 - settings save in database
 
 ## Version 0.7
 
-- create different notebooks, switch between them
+- create different notebooks
+- special window for notebooks and context switch
 
 ## Version 0.8
 
-- todo list next to sodenotes, stored in database
+- todo list next to sidenotes, stored in database
+
+## Version 0.9
+
+- two notes direction (contexts), the main, which is database and 'projects' opened from files
 
 ## Backlog
 
