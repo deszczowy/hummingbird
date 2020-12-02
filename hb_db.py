@@ -124,15 +124,7 @@ class Database():
             print("NOT OPEN :GET DBV")
             return False
         
-        query = QSqlQuery()
-        query.exec_("SELECT entry FROM dictionary WHERE key = 'db_version'")
-        res = "1"
-        while query.next():
-            res = query.value(0)
-            if res == "":
-                res = "1"
-
-        return int(res)
+        return int(self.get_value("db_version", "1"))
         
     def update(self):
         local_version = self.get_database_version()
@@ -170,3 +162,47 @@ class Database():
 
             for query in queries:
                 sqlQuery.exec_(query)
+
+    def store_value(self, key, value):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN: STORE")
+            return False
+        
+        query = QSqlQuery()
+        query.prepare("INSERT OR REPLACE INTO dictionary(key, entry) VALUES(:key, :value);")
+        query.bindValue(":key", key)
+        query.bindValue(":value", value)
+        query.exec_()
+
+    def get_value(self, key, default_value):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :GET VALUE")
+            return False
+        
+        query = QSqlQuery()
+        query.prepare(
+        """WITH list(key) AS (
+               VALUES (:key)
+           )
+           SELECT IFNULL(entry, :def) AS value
+           FROM list
+           LEFT JOIN dictionary USING (key);
+        """
+        )
+        query.bindValue(":key", key)
+        query.bindValue(":def", default_value)
+        query.exec_()
+
+        result = ""
+        while query.next():
+            res = query.value(0)
+            if res == "":
+                res = default_value
+
+        return res
