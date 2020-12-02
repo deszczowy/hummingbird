@@ -175,6 +175,7 @@ class MainWindow(QMainWindow):
         self.sideNotes.setFocus()
 
     def action_terminate(self):
+        self.save_window_position()
         self.action_save()
         self.close()
     # }
@@ -184,6 +185,7 @@ class MainWindow(QMainWindow):
 
     # events {
     def closeEvent(self, event):
+        self.save_window_position()
         self.action_save()
         event.accept()
     # }
@@ -358,10 +360,27 @@ class MainWindow(QMainWindow):
         self.setup_window_geometry()
         self.setWindowTitle(self.version.app_name())
 
-    def setup_window_geometry(self):
+    def setup_window_size(self):
+        if int(Database().get_value("window_width", "-1")) == -1 or int(Database().get_value("window_height", "-1")):
+            self.setup_default_window_geometry()
+        else:
+            self.setup_window_geometry()
+
+    def setup_default_window_geometry(self):
         screen = QDesktopWidget().screenGeometry(-1)
         w = (screen.width() / 3) *2
         h = (screen.height() / 3) *2
+        if w < 800: 
+            w = 800
+        if h < 600:
+            h = 600        
+        self.setGeometry(0, 0, int(w), int(h))
+        print(w)
+        print(h)
+
+    def setup_window_geometry(self):
+        w = int(Database().get_value("window_width", "800"))
+        h = int(Database().get_value("window_height", "600"))
         if w < 800: 
             w = 800
         if h < 600:
@@ -384,6 +403,24 @@ class MainWindow(QMainWindow):
         self.shortcutNormal.activated.connect(self.switch_editor_mode_to_normal)
         self.shortcutFocus.activated.connect(self.switch_editor_mode_to_focus)
 
+    def place_window_in_saved_position(self):
+        x = int(Database().get_value("window_left", "-1"))
+        y = int(Database().get_value("window_top", "-1"))
+        if x == -1 or y == -1:
+            self.center()
+        else:
+            geometry = self.frameGeometry()
+            geometry.setX(x) 
+            geometry.setY(y)
+            self.move(geometry.topLeft())
+    
+    def save_window_position(self):
+        geometry = self.frameGeometry()
+        Database().store_value("window_left", geometry.x())
+        Database().store_value("window_top", geometry.y())
+        Database().store_value("window_width", geometry.width())
+        Database().store_value("window_height", geometry.height())
+
     def center(self):
         geometry = self.frameGeometry()
         screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
@@ -398,7 +435,7 @@ class MainWindow(QMainWindow):
         self.stack_gui_elements()
         self.setup_app()
         self.prepare_timers()
-        self.center()
+        self.place_window_in_saved_position()
         self.setCentralWidget(self.hMainWindow)
     # }
 
