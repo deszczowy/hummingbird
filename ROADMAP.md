@@ -2,7 +2,7 @@
 
 ## Version 0.5
 
-- save window position in database
++ save window position in database
 - visible yet not disturbing list of shortcuts and available actions
 
 ## Version 0.6

@@ -370,10 +370,10 @@ class MainWindow(QMainWindow):
         w = int(Database().get_value("window_width", "-1"))
         h = int(Database().get_value("window_height", "-1"))
 
-        print(x)
-        print(y)
-        print(w)
-        print(h)
+        #print(x)
+        #print(y)
+        #print(w)
+        #print(h)
 
         self.setGeometry(x, y, int(w), int(h))
         if x < 0 or y < 0:
