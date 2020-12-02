@@ -385,7 +385,6 @@ class MainWindow(QMainWindow):
         #print(w)
         #print(h)
 
-        self.setGeometry(x, y, int(w), int(h))
         if x < 0 or y < 0:
             screen = QDesktopWidget().screenGeometry(-1)
             w = (screen.width() / 3) *2
@@ -402,6 +401,7 @@ class MainWindow(QMainWindow):
             if h < 600:
                 h = 600
             self.setGeometry(x, y, int(w), int(h))
+            self.move(x, y)
 
 
     def setup_icon(self):
@@ -420,9 +420,10 @@ class MainWindow(QMainWindow):
 
     def save_window_position(self):
         if not self.isMaximized():
-            geometry = self.frameGeometry()
-            Database().store_value("window_left", geometry.x())
-            Database().store_value("window_top", geometry.y())
+            geometry = self.geometry()
+            pos = self.pos()
+            Database().store_value("window_left", pos.x())
+            Database().store_value("window_top", pos.y())
             Database().store_value("window_width", geometry.width())
             Database().store_value("window_height", geometry.height())
         maximized = "1" if self.isMaximized() else "0"
