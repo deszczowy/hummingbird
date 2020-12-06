@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import (
 
 from hb_notes import Notes
 from hb_version import VersionInfo
-from hb_enums import (ActivePanel, EditorMode)
+from hb_enums import (ActivePanel, EditorMode, EditorTheme)
 
 from hb_dir import Directory
 
@@ -35,6 +35,7 @@ class MainWindow(QMainWindow):
         self.hMainWindow = QFrame()
         self.marginWidth = 0
         self.editorMode = EditorMode.Normal
+        self.editorTheme = EditorTheme.Dark
         # timer
         self.tic = 0
         self.timer = QTimer(self)
@@ -77,7 +78,7 @@ class MainWindow(QMainWindow):
         self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
         self.shortcutMain = QShortcut(QKeySequence("F2"), self)
         self.shortcutSide = QShortcut(QKeySequence("F3"), self)
-        self.shortcutNormal = QShortcut(QKeySequence("F7"), self)
+        self.shortcutTheme = QShortcut(QKeySequence("F7"), self)
         self.shortcutFocus = QShortcut(QKeySequence("F8"), self)
         self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
         self.shortcutExit = QShortcut(QKeySequence("F10"), self)
@@ -86,16 +87,33 @@ class MainWindow(QMainWindow):
         self.init_ui()
         #print("Start")
 
+    def get_theme(self):
+        return self.editorTheme
+
+    # editor themes {
+    def switch_editor_theme(self):
+        if self.editorTheme == EditorTheme.Dark:
+            self.editorTheme = EditorTheme.Light
+        else:
+            self.editorTheme = EditorTheme.Dark
+        self.set_editor_theme()
+
+    def set_editor_theme(self):
+        self.sideNotes.setStyleSheet(self.stylist.get_side_notes_style_sheet(self.editorTheme))
+        self.statusBoard.setStyleSheet(self.stylist.get_status_board_style_sheet(self.editorTheme))
+        self.setup_shortcut_list()
+        self.setStyleSheet(self.stylist.get_style_sheet(self.editorTheme))
+    # }
+
     # editor modes {
     def switch_editor_mode_to_focus(self):
         self.editorMode = EditorMode.Focus
         self.set_focus_mode_margins()
-    
-    def switch_editor_mode_to_normal(self):
+
         self.editorMode = EditorMode.Normal
         self.mainPage.setViewportMargins(0, 0, 0, 0)
         self.marginWidth = 0
-
+    
     def set_focus_mode_margins(self):
         margin = self.width() - self.sideNotes.width() - 750
         margin = round(margin / 2)
@@ -204,7 +222,6 @@ class MainWindow(QMainWindow):
         self.mainPage.setContentsMargins(0, 0, 0, 0)
         self.sideNotes.setContentsMargins(0, 0, 0, 0)
         self.sideNotes.setFixedWidth(300)
-        self.sideNotes.setStyleSheet(self.stylist.get_side_notes_style_sheet())
         self.desktop.setContentsMargins(0, 0, 0, 0)
         self.binding.setContentsMargins(0, 0, 0, 0)
         self.binding.setSpacing(0)
@@ -241,7 +258,6 @@ class MainWindow(QMainWindow):
         self.statusLayout.setContentsMargins(0, 0, 0, 0)
         self.statusLayout.addSpacing(0)
         self.statusBoard.setLayout(self.statusLayout)
-        self.statusBoard.setStyleSheet(self.stylist.get_status_board_style_sheet())
 
     # status slots
     def setup_switch_buttons(self):
@@ -361,14 +377,7 @@ class MainWindow(QMainWindow):
         self.stack_book_elements()
         self.stack_status_elements()
         self.stack_settings_elements()
-
-        self.shortcutInfoLabel.setText("""
-        <p style="line-height:0px; font-size:10px; font-family:mono; width:100%; text-align:center; color:silver;">
-        [F1 info]             [F9 settings]         [ESC hide panels]  
-        [F10 save and quit]   [F2 main note]        [F3 side note] 
-        [Ctrl+S save all]
-        </p>
-        """)   
+        self.setup_shortcut_list()
 
         self.appLayout.setContentsMargins(0, 0, 0, 0)
         self.appLayout.setSpacing(0)
@@ -377,8 +386,18 @@ class MainWindow(QMainWindow):
         self.appLayout.addWidget(self.switchBoard)
         self.appLayout.addWidget(self.shortcutInfoLabel)
         self.hMainWindow.setLayout(self.appLayout)
+    
+    def setup_shortcut_list(self):
+        self.shortcutInfoLabel.setText(
+        "<p style=\"" + self.stylist.get_shortcut_info_style_sheet(self.editorTheme) + "\">" +
+        "[F1 info]             [F9 settings]         [ESC hide panels] " +
+        "[F10 save and quit]   [F2 main note]        [F3 side note]" +
+        "[Ctrl+S save all]" + 
+        "</p>"
+        )   
 
     def setup_app(self):
+        self.set_editor_theme()
         self.setup_icon()
         self.bind_shortcuts()
         self.setWindowTitle(self.version.app_name())
@@ -429,7 +448,7 @@ class MainWindow(QMainWindow):
         self.shortcutSetup.activated.connect(self.on_settings_toggle)
         self.shortcutHide.activated.connect(self.hide_all_panels)
         self.shortcutExit.activated.connect(self.action_terminate)
-        self.shortcutNormal.activated.connect(self.switch_editor_mode_to_normal)
+        self.shortcutTheme.activated.connect(self.switch_editor_theme)
         self.shortcutFocus.activated.connect(self.switch_editor_mode_to_focus)
 
     def save_window_position(self):
@@ -464,15 +483,9 @@ class MainWindow(QMainWindow):
 def main():
     Database().create()
     app = QApplication(sys.argv)
-    app.setStyleSheet(Stylist().get_style_sheet())
     w = MainWindow()
     w.show()
     app.exec()
-
-    #gui = HummingBirdGui()
-    
-
-    #sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()

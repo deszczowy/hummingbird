@@ -8,3 +8,7 @@ class ActivePanel(Enum):
 class EditorMode(Enum):
     Normal = 0
     Focus = 1
+
+class EditorTheme(Enum):
+    Light = 0
+    Dark = 1
