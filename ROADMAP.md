@@ -3,7 +3,7 @@
 ## Version 0.6
 
 - build executables, compiled version available to download
-- dark mode. 
++ dark mode. 
 - focus mode
 
 ## Version 0.7

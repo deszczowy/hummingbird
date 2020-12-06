@@ -398,7 +398,8 @@ class MainWindow(QMainWindow):
         self.shortcutInfoLabel.setText(
         "<p style=\"" + self.stylist.get_shortcut_info_style_sheet(self.editorTheme) + "\">" +
         "[F1 info]             [F9 settings]         [ESC hide panels] " +
-        "[F10 save and quit]   [F2 main note]        [F3 side note]" +
+        "[F10 save and quit]   [F2 main note]        [F3 side note] " +
+        "[F7 theme switch ] " +
         "[Ctrl+S save all]" +
         "</p>"
         )   
