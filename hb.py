@@ -210,8 +210,9 @@ class MainWindow(QMainWindow):
         self.binding.setSpacing(0)
     
     def stack_book_elements(self):
-        self.mainPage.setFontPointSize(13)
-        self.sideNotes.setFontPointSize(13)
+        text_size = int(Database().get_value("text_size", "13"))
+        self.mainPage.setFontPointSize(text_size)
+        self.sideNotes.setFontPointSize(text_size)
         self.binding.addWidget(self.mainPage)
         self.binding.addWidget(self.sideNotes)
         self.desktop.setLayout(self.binding)
@@ -302,11 +303,12 @@ class MainWindow(QMainWindow):
         self.fontSizeLabel.setFixedHeight(20)
         self.fontSizeLabel.setFixedWidth(100)
 
-        self.fontSizeValue.setText("13")
+        self.fontSizeValue.setText(Database().get_value("text_size", "13"))
         self.fontSizeValue.setInputMask("D9")
         self.fontSizeValue.setFixedHeight(30)
         self.fontSizeValue.setFixedWidth(70)
         self.fontSizeValue.textChanged.connect(self.on_font_size_change)
+        
 
         self.optionsLayout.addWidget(self.fontSizeLabel, 0, 0)
         self.optionsLayout.addWidget(self.fontSizeValue, 0, 1)
@@ -323,6 +325,8 @@ class MainWindow(QMainWindow):
             pt = 1
         else:
             pt = int(size)
+
+        Database().store_value("text_size", pt)
 
         mainPageTextCursor = self.mainPage.textCursor()
         sideNoteTextCursor = self.sideNotes.textCursor()
