@@ -4,7 +4,7 @@
 
 This is a little notebook, with two visible editors. First one for main long notes. Second one for easy accessible additional side notes.
 
-Current version is `0.4`
+Current version is `0.6`
 
 ![Hummingbird main window](/res/screenshot.png)
 
@@ -18,6 +18,8 @@ In this version there are two main features:
 
 - Two visible editors
 - Autosave
+- Dark theme
+- Focus mode
 
 ## Keyboard shortcuts
 
@@ -26,6 +28,8 @@ You can work with Hummingbird using only keyboard. Available shortcuts are liste
 - `F1`: show info panel
 - `F2`: focus on main note
 - `F3`: focus on side note
+- `F7`: switch between light and dark theme
+- `F8`: switch between normal and focus editing mode
 - `F9`: show settings panel
 - `F10`: quit application with all notes saved
 - `ESC`: hide bottom panels
@@ -43,3 +47,9 @@ The beautiful Hummingbird logo is made by [Freepik](https://www.flaticon.com/aut
 
 #### Ver. 0.4
 - Last 40 saves are stored in database
+
+#### Ver. 0.5
+- Many editor parameters are now stored in database. Those are settings, window size and position.
+
+#### Ver. 0.6
+- Editor now has dark theme and focus mode, but only theme is remembered in database.

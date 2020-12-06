@@ -1,11 +1,5 @@
 # Hummingbird Editor Roadmap
 
-## Version 0.6
-
-- build executables, compiled version available to download
-+ dark mode. 
-+ focus mode
-
 ## Version 0.7
 
 - create different notebooks
