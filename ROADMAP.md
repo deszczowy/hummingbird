@@ -4,7 +4,7 @@
 
 - build executables, compiled version available to download
 + dark mode. 
-- focus mode
++ focus mode
 
 ## Version 0.7
 

@@ -139,6 +139,11 @@ class Stylist():
         return """
             border-left: 1px dashed black;
         """
+    def get_side_notes_style_focus(self, theme):
+        if theme == EditorTheme.Dark:
+            return "border:0px; color: #252525;"
+        else:
+            return "border:0px; color: silver;"
 
 
 
@@ -160,7 +165,11 @@ class Stylist():
                 border-top: 1px dashed black; 
             }
         """
-
+    def get_status_board_style_focus(self, theme):
+        if theme == EditorTheme.Dark:
+            return ".QFrame {border:0px;} QPushButton {color: #252525;}"
+        else:
+            return ".QFrame {border:0px;} QPushButton {color: silver;}"
 
 
     def get_shortcut_info_style_sheet(self, theme):

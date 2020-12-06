@@ -79,7 +79,7 @@ class MainWindow(QMainWindow):
         self.shortcutMain = QShortcut(QKeySequence("F2"), self)
         self.shortcutSide = QShortcut(QKeySequence("F3"), self)
         self.shortcutTheme = QShortcut(QKeySequence("F7"), self)
-        self.shortcutFocus = QShortcut(QKeySequence("F8"), self)
+        self.shortcutMode = QShortcut(QKeySequence("F8"), self)
         self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
         self.shortcutExit = QShortcut(QKeySequence("F10"), self)
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
@@ -113,13 +113,24 @@ class MainWindow(QMainWindow):
     # }
 
     # editor modes {
-    def switch_editor_mode_to_focus(self):
-        self.editorMode = EditorMode.Focus
-        self.set_focus_mode_margins()
-
-        self.editorMode = EditorMode.Normal
-        self.mainPage.setViewportMargins(0, 0, 0, 0)
-        self.marginWidth = 0
+    def switch_editor_mode(self):
+        if self.editorMode == EditorMode.Focus:
+            self.editorMode = EditorMode.Normal
+        else:
+            self.editorMode = EditorMode.Focus
+        self.set_editor_mode()
+    
+    def set_editor_mode(self):
+        if self.editorMode == EditorMode.Focus:
+            self.set_focus_mode_margins()
+            self.shortcutInfoLabel.hide()
+            self.sideNotes.setStyleSheet(self.stylist.get_side_notes_style_focus(self.editorTheme))
+            self.statusBoard.setStyleSheet(self.stylist.get_status_board_style_focus(self.editorTheme))
+        else: # normal
+            self.mainPage.setViewportMargins(0, 0, 0, 0)
+            self.marginWidth = 0
+            self.shortcutInfoLabel.show()
+            self.set_editor_theme()
     
     def set_focus_mode_margins(self):
         margin = self.width() - self.sideNotes.width() - 750
@@ -398,8 +409,8 @@ class MainWindow(QMainWindow):
         self.shortcutInfoLabel.setText(
         "<p style=\"" + self.stylist.get_shortcut_info_style_sheet(self.editorTheme) + "\">" +
         "[F1 info]             [F9 settings]         [ESC hide panels] " +
-        "[F10 save and quit]   [F2 main note]        [F3 side note] " +
-        "[F7 theme switch ] " +
+        "[F10 quit]   [F2 main note]        [F3 side note] " +
+        "[F7 themes ] [F8 focus] " +
         "[Ctrl+S save all]" +
         "</p>"
         )   
@@ -458,7 +469,7 @@ class MainWindow(QMainWindow):
         self.shortcutHide.activated.connect(self.hide_all_panels)
         self.shortcutExit.activated.connect(self.action_terminate)
         self.shortcutTheme.activated.connect(self.switch_editor_theme)
-        self.shortcutFocus.activated.connect(self.switch_editor_mode_to_focus)
+        self.shortcutMode.activated.connect(self.switch_editor_mode)
 
     def save_window_position(self):
         if not self.isMaximized():
