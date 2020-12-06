@@ -9,6 +9,10 @@ class Stylist():
                 background-color: white;
             } 
 
+            QLineEdit {
+                border: 1px dotted silver;
+            }
+
             QPushButton {
                 font-size:12px; 
                 color: silver;

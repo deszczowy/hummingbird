@@ -13,8 +13,8 @@ from PyQt5.QtGui import QKeySequence, QPixmap
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QFrame, QMessageBox,
-    QHBoxLayout, QVBoxLayout,
-    QTextEdit, QPushButton, QLabel, QSpinBox,
+    QHBoxLayout, QVBoxLayout, QGridLayout,
+    QTextEdit, QPushButton, QLabel, QLineEdit,
     QShortcut, QDesktopWidget
 )
 
@@ -64,8 +64,8 @@ class MainWindow(QMainWindow):
         # - settings board
         self.optionsBoard = QFrame()
         self.fontSizeLabel = QLabel()
-        self.fontSizeValue = QSpinBox()
-        self.optionsLayout = QHBoxLayout()
+        self.fontSizeValue = QLineEdit()
+        self.optionsLayout = QGridLayout()
         # - info board
         self.infoBoard = QFrame()
         self.infoLayout = QHBoxLayout()
@@ -302,28 +302,38 @@ class MainWindow(QMainWindow):
         self.fontSizeLabel.setFixedHeight(20)
         self.fontSizeLabel.setFixedWidth(100)
 
-        self.fontSizeValue.setMinimum(6)
-        self.fontSizeValue.setMaximum(100)
-        self.fontSizeValue.setValue(13)
+        self.fontSizeValue.setText("13")
+        self.fontSizeValue.setInputMask("D9")
         self.fontSizeValue.setFixedHeight(30)
         self.fontSizeValue.setFixedWidth(70)
-        self.fontSizeValue.valueChanged.connect(self.on_font_size_change)
+        self.fontSizeValue.textChanged.connect(self.on_font_size_change)
 
-        self.optionsLayout.addWidget(self.fontSizeLabel)
-        self.optionsLayout.addWidget(self.fontSizeValue)
+        self.optionsLayout.addWidget(self.fontSizeLabel, 0, 0)
+        self.optionsLayout.addWidget(self.fontSizeValue, 0, 1)
+        self.optionsLayout.setRowStretch(2, 1) # stretching the next, empty row lead to keeping above rows not stretched
+        self.optionsLayout.setColumnStretch(2, 1)
+        self.optionsLayout.setColumnMinimumWidth(0, 100)
+        self.optionsLayout.setColumnMinimumWidth(1, 100)
+
         self.optionsBoard.setLayout(self.optionsLayout)
 
     def on_font_size_change(self):
+        size = self.fontSizeValue.text()
+        if size == "" or size =="0":
+            pt = 1
+        else:
+            pt = int(size)
+
         mainPageTextCursor = self.mainPage.textCursor()
         sideNoteTextCursor = self.sideNotes.textCursor()
         mainPageModified = self.mainPage.document().isModified()
         sideNoteModified = self.sideNotes.document().isModified()
         self.mainPage.selectAll()
-        self.mainPage.setFontPointSize(self.fontSizeValue.value())
+        self.mainPage.setFontPointSize(pt)
         self.mainPage.setTextCursor(mainPageTextCursor)
         self.mainPage.document().setModified(mainPageModified)
         self.sideNotes.selectAll()
-        self.sideNotes.setFontPointSize(self.fontSizeValue.value())
+        self.sideNotes.setFontPointSize(pt)
         self.sideNotes.setTextCursor(sideNoteTextCursor)
         self.sideNotes.document().setModified(sideNoteModified)
 
