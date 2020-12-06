@@ -1,12 +1,5 @@
 # Hummingbird Editor Roadmap
 
-## Version 0.5
-
-+ save window position in database
-+ visible yet not disturbing list of shortcuts and available actions
-+ readable settings panel
-+ settings save in database
-
 ## Version 0.6
 
 - build executables, compiled version available to download
