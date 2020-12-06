@@ -91,6 +91,13 @@ class MainWindow(QMainWindow):
         return self.editorTheme
 
     # editor themes {
+    def read_theme_from_settings(self):
+        theme = Database().get_value("theme", "L")
+        if theme == "D":
+            self.editorTheme = EditorTheme.Dark
+        else :
+            self.editorTheme = EditorTheme.Light
+
     def switch_editor_theme(self):
         if self.editorTheme == EditorTheme.Dark:
             self.editorTheme = EditorTheme.Light
@@ -392,11 +399,12 @@ class MainWindow(QMainWindow):
         "<p style=\"" + self.stylist.get_shortcut_info_style_sheet(self.editorTheme) + "\">" +
         "[F1 info]             [F9 settings]         [ESC hide panels] " +
         "[F10 save and quit]   [F2 main note]        [F3 side note]" +
-        "[Ctrl+S save all]" + 
+        "[Ctrl+S save all]" +
         "</p>"
         )   
 
     def setup_app(self):
+        self.read_theme_from_settings()
         self.set_editor_theme()
         self.setup_icon()
         self.bind_shortcuts()
@@ -461,6 +469,8 @@ class MainWindow(QMainWindow):
             Database().store_value("window_height", geometry.height())
         maximized = "1" if self.isMaximized() else "0"
         Database().store_value("window_max", maximized)
+        theme = "D" if self.editorTheme == EditorTheme.Dark else "L"
+        Database().store_value("theme", theme)
 
     def center(self):
         geometry = self.frameGeometry()
