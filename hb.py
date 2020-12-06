@@ -13,14 +13,14 @@ from PyQt5.QtGui import QKeySequence, QPixmap
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QFrame, QMessageBox,
-    QHBoxLayout, QVBoxLayout,
-    QTextEdit, QPushButton, QLabel, QSpinBox,
+    QHBoxLayout, QVBoxLayout, QGridLayout,
+    QTextEdit, QPushButton, QLabel, QLineEdit,
     QShortcut, QDesktopWidget
 )
 
 from hb_notes import Notes
 from hb_version import VersionInfo
-from hb_enums import ActivePanel
+from hb_enums import (ActivePanel, EditorMode)
 
 from hb_dir import Directory
 
@@ -33,7 +33,8 @@ class MainWindow(QMainWindow):
         super().__init__(*args, **kwargs)
 
         self.hMainWindow = QFrame()
-
+        self.marginWidth = 0
+        self.editorMode = EditorMode.Normal
         # timer
         self.tic = 0
         self.timer = QTimer(self)
@@ -63,18 +64,21 @@ class MainWindow(QMainWindow):
         # - settings board
         self.optionsBoard = QFrame()
         self.fontSizeLabel = QLabel()
-        self.fontSizeValue = QSpinBox()
-        self.optionsLayout = QHBoxLayout()
+        self.fontSizeValue = QLineEdit()
+        self.optionsLayout = QGridLayout()
         # - info board
         self.infoBoard = QFrame()
         self.infoLayout = QHBoxLayout()
         self.aboutLabel = QLabel()
+        self.shortcutInfoLabel = QLabel()
         self.iconLabel = QLabel()
         # keys
         self.shortcutSave = QShortcut(QKeySequence("Ctrl+S"), self)
         self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
         self.shortcutMain = QShortcut(QKeySequence("F2"), self)
         self.shortcutSide = QShortcut(QKeySequence("F3"), self)
+        self.shortcutNormal = QShortcut(QKeySequence("F7"), self)
+        self.shortcutFocus = QShortcut(QKeySequence("F8"), self)
         self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
         self.shortcutExit = QShortcut(QKeySequence("F10"), self)
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
@@ -82,7 +86,30 @@ class MainWindow(QMainWindow):
         self.init_ui()
         #print("Start")
 
+    # editor modes {
+    def switch_editor_mode_to_focus(self):
+        self.editorMode = EditorMode.Focus
+        self.set_focus_mode_margins()
+    
+    def switch_editor_mode_to_normal(self):
+        self.editorMode = EditorMode.Normal
+        self.mainPage.setViewportMargins(0, 0, 0, 0)
+        self.marginWidth = 0
 
+    def set_focus_mode_margins(self):
+        margin = self.width() - self.sideNotes.width() - 750
+        margin = round(margin / 2)
+
+        if margin < 0:
+            margin = 0
+        if margin != self.marginWidth:
+            self.mainPage.setViewportMargins(margin, 20, margin, 20)
+            self.marginWidth = margin
+    # }
+
+    def resizeEvent(self, event):
+        if self.editorMode == EditorMode.Focus:
+            self.set_focus_mode_margins()
 
 
     # timers {
@@ -149,6 +176,7 @@ class MainWindow(QMainWindow):
         self.sideNotes.setFocus()
 
     def action_terminate(self):
+        self.save_window_position()
         self.action_save()
         self.close()
     # }
@@ -158,6 +186,7 @@ class MainWindow(QMainWindow):
 
     # events {
     def closeEvent(self, event):
+        self.save_window_position()
         self.action_save()
         event.accept()
     # }
@@ -181,8 +210,9 @@ class MainWindow(QMainWindow):
         self.binding.setSpacing(0)
     
     def stack_book_elements(self):
-        self.mainPage.setFontPointSize(13)
-        self.sideNotes.setFontPointSize(13)
+        text_size = int(Database().get_value("text_size", "13"))
+        self.mainPage.setFontPointSize(text_size)
+        self.sideNotes.setFontPointSize(text_size)
         self.binding.addWidget(self.mainPage)
         self.binding.addWidget(self.sideNotes)
         self.desktop.setLayout(self.binding)
@@ -260,7 +290,7 @@ class MainWindow(QMainWindow):
         This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
         Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
         """
-        )        
+        )
         self.aboutLabel.setOpenExternalLinks(True)
         self.aboutLabel.setWordWrap(True)
         self.infoLayout.addWidget(self.iconLabel)
@@ -273,28 +303,41 @@ class MainWindow(QMainWindow):
         self.fontSizeLabel.setFixedHeight(20)
         self.fontSizeLabel.setFixedWidth(100)
 
-        self.fontSizeValue.setMinimum(6)
-        self.fontSizeValue.setMaximum(100)
-        self.fontSizeValue.setValue(13)
+        self.fontSizeValue.setText(Database().get_value("text_size", "13"))
+        self.fontSizeValue.setInputMask("D9")
         self.fontSizeValue.setFixedHeight(30)
         self.fontSizeValue.setFixedWidth(70)
-        self.fontSizeValue.valueChanged.connect(self.on_font_size_change)
+        self.fontSizeValue.textChanged.connect(self.on_font_size_change)
+        
 
-        self.optionsLayout.addWidget(self.fontSizeLabel)
-        self.optionsLayout.addWidget(self.fontSizeValue)
+        self.optionsLayout.addWidget(self.fontSizeLabel, 0, 0)
+        self.optionsLayout.addWidget(self.fontSizeValue, 0, 1)
+        self.optionsLayout.setRowStretch(2, 1) # stretching the next, empty row lead to keeping above rows not stretched
+        self.optionsLayout.setColumnStretch(2, 1)
+        self.optionsLayout.setColumnMinimumWidth(0, 100)
+        self.optionsLayout.setColumnMinimumWidth(1, 100)
+
         self.optionsBoard.setLayout(self.optionsLayout)
 
     def on_font_size_change(self):
+        size = self.fontSizeValue.text()
+        if size == "" or size =="0":
+            pt = 1
+        else:
+            pt = int(size)
+
+        Database().store_value("text_size", pt)
+
         mainPageTextCursor = self.mainPage.textCursor()
         sideNoteTextCursor = self.sideNotes.textCursor()
         mainPageModified = self.mainPage.document().isModified()
         sideNoteModified = self.sideNotes.document().isModified()
         self.mainPage.selectAll()
-        self.mainPage.setFontPointSize(self.fontSizeValue.value())
+        self.mainPage.setFontPointSize(pt)
         self.mainPage.setTextCursor(mainPageTextCursor)
         self.mainPage.document().setModified(mainPageModified)
         self.sideNotes.selectAll()
-        self.sideNotes.setFontPointSize(self.fontSizeValue.value())
+        self.sideNotes.setFontPointSize(pt)
         self.sideNotes.setTextCursor(sideNoteTextCursor)
         self.sideNotes.document().setModified(sideNoteModified)
 
@@ -319,30 +362,61 @@ class MainWindow(QMainWindow):
         self.stack_status_elements()
         self.stack_settings_elements()
 
+        self.shortcutInfoLabel.setText("""
+        <p style="line-height:0px; font-size:10px; font-family:mono; width:100%; text-align:center; color:silver;">
+        [F1 info]             [F9 settings]         [ESC hide panels]  
+        [F10 save and quit]   [F2 main note]        [F3 side note] 
+        [Ctrl+S save all]
+        </p>
+        """)   
+
         self.appLayout.setContentsMargins(0, 0, 0, 0)
         self.appLayout.setSpacing(0)
         self.appLayout.addWidget(self.desktop)
         self.appLayout.addWidget(self.statusBoard)
         self.appLayout.addWidget(self.switchBoard)
+        self.appLayout.addWidget(self.shortcutInfoLabel)
         self.hMainWindow.setLayout(self.appLayout)
 
     def setup_app(self):
         self.setup_icon()
         self.bind_shortcuts()
-        self.setup_window_geometry()
         self.setWindowTitle(self.version.app_name())
+        self.setup_window_geometry()
+        if int(Database().get_value("window_max", "0")) == 1:
+            self.showMaximized()
+        else:
+            self.showNormal()
 
     def setup_window_geometry(self):
-        screen = QDesktopWidget().screenGeometry(-1)
-        w = (screen.width() / 3) *2
-        h = (screen.height() / 3) *2
-        if w < 800: 
-            w = 800
-        if h < 600:
-            h = 600        
-        self.setGeometry(0, 0, int(w), int(h))
-        print(w)
-        print(h)
+        x = int(Database().get_value("window_left", "-1"))
+        y = int(Database().get_value("window_top", "-1"))
+        w = int(Database().get_value("window_width", "-1"))
+        h = int(Database().get_value("window_height", "-1"))
+
+        #print(x)
+        #print(y)
+        #print(w)
+        #print(h)
+
+        if x < 0 or y < 0:
+            screen = QDesktopWidget().screenGeometry(-1)
+            w = (screen.width() / 3) *2
+            h = (screen.height() / 3) *2
+            if w < 800: 
+                w = 800
+            if h < 600:
+                h = 600
+            self.setGeometry(0, 0, int(w), int(h))
+            self.center()
+        else:
+            if w < 800: 
+                w = 800
+            if h < 600:
+                h = 600
+            self.setGeometry(x, y, int(w), int(h))
+            self.move(x, y)
+
 
     def setup_icon(self):
         self.setWindowIcon(QtGui.QIcon(self.directory.get_resource_dir() + 'icon.png'))
@@ -355,6 +429,19 @@ class MainWindow(QMainWindow):
         self.shortcutSetup.activated.connect(self.on_settings_toggle)
         self.shortcutHide.activated.connect(self.hide_all_panels)
         self.shortcutExit.activated.connect(self.action_terminate)
+        self.shortcutNormal.activated.connect(self.switch_editor_mode_to_normal)
+        self.shortcutFocus.activated.connect(self.switch_editor_mode_to_focus)
+
+    def save_window_position(self):
+        if not self.isMaximized():
+            geometry = self.geometry()
+            pos = self.pos()
+            Database().store_value("window_left", pos.x())
+            Database().store_value("window_top", pos.y())
+            Database().store_value("window_width", geometry.width())
+            Database().store_value("window_height", geometry.height())
+        maximized = "1" if self.isMaximized() else "0"
+        Database().store_value("window_max", maximized)
 
     def center(self):
         geometry = self.frameGeometry()
@@ -364,13 +451,13 @@ class MainWindow(QMainWindow):
         self.move(geometry.topLeft())
 
     def init_ui(self):
+        self.setMinimumSize(800, 600)
         self.prepare_book()
         self.prepare_status_board()
         self.prepare_settings_board()
         self.stack_gui_elements()
         self.setup_app()
         self.prepare_timers()
-        self.center()
         self.setCentralWidget(self.hMainWindow)
     # }
 

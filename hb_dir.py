@@ -16,7 +16,7 @@ class Directory():
     def get_notes_dir(self):
         notesDir = self.root + os.path.sep + self.notes
         Path(notesDir).mkdir(parents=True, exist_ok=True)
-        print(notesDir)
+        # print(notesDir)
         return notesDir + os.path.sep
 
     def get_resource_dir(self):

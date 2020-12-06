@@ -4,7 +4,7 @@ class VersionInfo():
 
     def __init__(self):
         self.appName = "Hummingbird"
-        self.appVersion = "0.4"
+        self.appVersion = "0.5"
 
     def app_name(self):
         return self.appName
