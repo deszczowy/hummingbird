@@ -2,6 +2,6 @@
 
 rm ./dist/*
 rm ./hb
-pyinstaller --clean --onefile -w --icon=icon.ico hb.py
+python3 -m PyInstaller --clean --onefile -w --icon=icon.ico hb.py
 cp ./dist/hb ./
 ./hb
