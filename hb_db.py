@@ -43,12 +43,12 @@ class Database():
 
         query = QSqlQuery()
         query.prepare(
-        """INSERT INTO notebook (id, content, version, save_time, main_page, archived, topic) values (
-            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
+        """INSERT INTO notebook (id, folder, content, version, save_time, main_page, archived) values (
+            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 1,
             :content,
             (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE main_page = :mpage),
             datetime('now','localtime'),
-            :mpage, 0, 1
+            :mpage, 0
         );""")
                     
         query.bindValue(":content", content)
