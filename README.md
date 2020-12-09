@@ -32,6 +32,7 @@ You can work with Hummingbird using only keyboard. Available shortcuts are liste
 - `F8`: switch between normal and focus editing mode
 - `F9`: show settings panel
 - `F10`: quit application with all notes saved
+- `F11`: toggle fullscreen
 - `ESC`: hide bottom panels
 - `Ctrl+S`: Save all notes
 

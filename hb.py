@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
         self.marginWidth = 0
         self.editorMode = EditorMode.Normal
         self.editorTheme = EditorTheme.Dark
+        self.wasMaximized = False
         # timer
         self.tic = 0
         self.timer = QTimer(self)
@@ -82,13 +83,22 @@ class MainWindow(QMainWindow):
         self.shortcutMode = QShortcut(QKeySequence("F8"), self)
         self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
         self.shortcutExit = QShortcut(QKeySequence("F10"), self)
+        self.shortcutFullscreen = QShortcut(QKeySequence("F11"), self)
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
         # go!
         self.init_ui()
         #print("Start")
 
-    def get_theme(self):
-        return self.editorTheme
+    def toggle_fullscreen(self):
+        if self.isFullScreen():
+            if self.wasMaximized:
+                self.showNormal()
+                self.showMaximized()
+            else:
+                self.showNormal()
+        else:
+            self.wasMaximized = self.isMaximized()
+            self.showFullScreen()
 
     # editor themes {
     def read_theme_from_settings(self):
@@ -410,7 +420,7 @@ class MainWindow(QMainWindow):
         "<p style=\"" + self.stylist.get_shortcut_info_style_sheet(self.editorTheme) + "\">" +
         "[F1 info]             [F9 settings]         [ESC hide panels] " +
         "[F10 quit]   [F2 main note]        [F3 side note] " +
-        "[F7 themes ] [F8 focus] " +
+        "[F7 themes ] [F8 focus] [F11 fullscreen] " +
         "[Ctrl+S save all]" +
         "</p>"
         )   
@@ -470,6 +480,7 @@ class MainWindow(QMainWindow):
         self.shortcutExit.activated.connect(self.action_terminate)
         self.shortcutTheme.activated.connect(self.switch_editor_theme)
         self.shortcutMode.activated.connect(self.switch_editor_mode)
+        self.shortcutFullscreen.activated.connect(self.toggle_fullscreen)
 
     def save_window_position(self):
         if not self.isMaximized():
