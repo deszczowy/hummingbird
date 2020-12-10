@@ -2,8 +2,9 @@
 
 ## Version 0.7
 
-- fullscreen
++ fullscreen
 - create different notebooks
+- frame for full app info, version and help
 - special window for notebooks and context switch
 
 ## Version 0.8
@@ -17,7 +18,6 @@
 
 ## Version 1.0
 
-- frame for full app info, version and help
 - frame for full accessible app settings
 - deb packages
 

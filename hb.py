@@ -372,10 +372,12 @@ class MainWindow(QMainWindow):
     # info panel {
     def build_info_panel(self):
         self.infoWindow = QWidget(self)
+        self.infoWindow.setStyleSheet("QWidget{border: 1px dotted silver;}")
         infoLayout = QVBoxLayout()
+        infoLayout.setContentsMargins(20, 20, 20, 20)
         
         icon = QLabel()
-        icon.setFixedWidth(50)
+        icon.setFixedWidth(80)
         
         myPixmap = QtGui.QPixmap(self.directory.get_resource_dir() + 'icon.png')
         myScaledPixmap = myPixmap.scaled(icon.size(), QtCore.Qt.KeepAspectRatio)
@@ -405,10 +407,12 @@ class MainWindow(QMainWindow):
         <br />
         Ctrl+S - Save all notebooks
         """
-        )  
+        )
+
         infoLayout.addWidget(icon)
         infoLayout.addWidget(about)
         infoLayout.addWidget(shortcuts)
+        infoLayout.addStretch()
 
         self.infoWindow.setLayout(infoLayout)
 
