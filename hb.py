@@ -59,7 +59,6 @@ class MainWindow(QMainWindow):
         self.statusLayout = QHBoxLayout()
         self.messageBoard = QLabel()
         self.toggleSettingsButton = QPushButton()
-        self.toggleAppInfoButton = QPushButton()
         # settings
         self.switchBoard = QFrame()
         self.switchLayout = QVBoxLayout()
@@ -68,12 +67,6 @@ class MainWindow(QMainWindow):
         self.fontSizeLabel = QLabel()
         self.fontSizeValue = QLineEdit()
         self.optionsLayout = QGridLayout()
-        # - info board
-        self.infoBoard = QFrame()
-        self.infoLayout = QHBoxLayout()
-        self.aboutLabel = QLabel()
-        self.shortcutInfoLabel = QLabel()
-        self.iconLabel = QLabel()
         # keys
         self.shortcutSave = QShortcut(QKeySequence("Ctrl+S"), self)
         self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
@@ -120,7 +113,6 @@ class MainWindow(QMainWindow):
     def set_editor_theme(self):
         self.sideNotes.setStyleSheet(self.stylist.get_side_notes_style_sheet(self.editorTheme))
         self.statusBoard.setStyleSheet(self.stylist.get_status_board_style_sheet(self.editorTheme))
-        self.setup_shortcut_list()
         self.setStyleSheet(self.stylist.get_style_sheet(self.editorTheme))
     # }
 
@@ -285,7 +277,6 @@ class MainWindow(QMainWindow):
 
     def stack_status_elements(self):
         self.statusLayout.addWidget(self.toggleSettingsButton)
-        self.statusLayout.addWidget(self.toggleAppInfoButton)
         self.statusLayout.addWidget(self.messageBoard)
         self.statusLayout.setContentsMargins(0, 0, 0, 0)
         self.statusLayout.addSpacing(0)
@@ -296,10 +287,6 @@ class MainWindow(QMainWindow):
         self.toggleSettingsButton.setText('\u25B3' + "Options" ) # + '\u25BD'
         self.toggleSettingsButton.setFixedWidth(70)
         self.toggleSettingsButton.clicked.connect(self.on_settings_toggle)
-
-        self.toggleAppInfoButton.setText('\u25B3' + "Info" )
-        self.toggleAppInfoButton.setFixedWidth(70)
-        self.toggleAppInfoButton.clicked.connect(self.on_info_toggle)
 
         self.messageBoard.setAlignment(QtCore.Qt.AlignRight)
 
@@ -319,31 +306,12 @@ class MainWindow(QMainWindow):
     # settings {
     def prepare_settings_board(self):
         self.set_settings_margins()
-        self.set_info_panel()
         self.set_settings_panel()
         self.stack_settings_elements()
 
     def set_settings_margins(self):
         self.switchLayout.setContentsMargins(0, 0, 0, 0)
         self.switchLayout.setSpacing(0)
-
-    def set_info_panel(self):
-        self.iconLabel.setFixedWidth(50)
-        
-        myPixmap = QtGui.QPixmap(self.directory.get_resource_dir() + 'icon.png')
-        myScaledPixmap = myPixmap.scaled(self.iconLabel.size(), QtCore.Qt.KeepAspectRatio)
-        self.iconLabel.setPixmap(myScaledPixmap)
-
-        self.aboutLabel.setText("""
-        This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
-        Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
-        """
-        )
-        self.aboutLabel.setOpenExternalLinks(True)
-        self.aboutLabel.setWordWrap(True)
-        self.infoLayout.addWidget(self.iconLabel)
-        self.infoLayout.addWidget(self.aboutLabel)
-        self.infoBoard.setLayout(self.infoLayout)
 
     def set_settings_panel(self):
         self.fontSizeLabel.setText("Font size")
@@ -391,13 +359,11 @@ class MainWindow(QMainWindow):
 
     def stack_settings_elements(self):
         self.switchLayout.addWidget(self.optionsBoard)
-        self.switchLayout.addWidget(self.infoBoard)
         self.switchBoard.setLayout(self.switchLayout)
         self.hide_all_panels()
 
     def hide_all_panels(self):
         self.optionsBoard.setFixedHeight(0)
-        self.infoBoard.setFixedHeight(0)
         self.switchBoard.setFixedHeight(0)
     # }
 
@@ -406,7 +372,46 @@ class MainWindow(QMainWindow):
     # info panel {
     def build_info_panel(self):
         self.infoWindow = QWidget(self)
-        #
+        infoLayout = QVBoxLayout()
+        
+        icon = QLabel()
+        icon.setFixedWidth(50)
+        
+        myPixmap = QtGui.QPixmap(self.directory.get_resource_dir() + 'icon.png')
+        myScaledPixmap = myPixmap.scaled(icon.size(), QtCore.Qt.KeepAspectRatio)
+        icon.setPixmap(myScaledPixmap)
+
+        about = QLabel()
+        about.setText("""
+        This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
+        Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
+        """
+        )
+        about.setOpenExternalLinks(True)
+        about.setWordWrap(True)
+
+        shortcuts = QLabel()
+        shortcuts.setText("""
+        F1 - Show this info<br />
+        F9 - Show settings board<br />
+        F10 - Save all notebooks and quit<br />
+        <br />
+        F2 - Focus on main note<br />
+        F3 - Focus on side note<br />
+        <br />
+        F7 - Switch between light and dark theme<br />
+        F8 - Switch between normal and focus mode<br />
+        F11 - Switch to fullscreen<br />
+        <br />
+        Ctrl+S - Save all notebooks
+        """
+        )  
+        infoLayout.addWidget(icon)
+        infoLayout.addWidget(about)
+        infoLayout.addWidget(shortcuts)
+
+        self.infoWindow.setLayout(infoLayout)
+
         self.infoWindow.hide()
         self.infoWindowExists = True
         self.resizeEvent(None)
@@ -428,26 +433,15 @@ class MainWindow(QMainWindow):
         self.stack_book_elements()
         self.stack_status_elements()
         self.stack_settings_elements()
-        self.setup_shortcut_list()
 
         self.appLayout.setContentsMargins(0, 0, 0, 0)
         self.appLayout.setSpacing(0)
         self.appLayout.addWidget(self.desktop)
         self.appLayout.addWidget(self.statusBoard)
         self.appLayout.addWidget(self.switchBoard)
-        self.appLayout.addWidget(self.shortcutInfoLabel)
+        #self.appLayout.addWidget(self.shortcutInfoLabel)
         self.hMainWindow.setLayout(self.appLayout)
     
-    def setup_shortcut_list(self):
-        self.shortcutInfoLabel.setText(
-        "<p style=\"" + self.stylist.get_shortcut_info_style_sheet(self.editorTheme) + "\">" +
-        "[F1 info]             [F9 settings]         [ESC hide panels] " +
-        "[F10 quit]   [F2 main note]        [F3 side note] " +
-        "[F7 themes ] [F8 focus] [F11 fullscreen] " +
-        "[Ctrl+S save all]" +
-        "</p>"
-        )   
-
     def setup_app(self):
         self.read_theme_from_settings()
         self.set_editor_theme()
