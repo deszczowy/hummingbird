@@ -85,6 +85,8 @@ class MainWindow(QMainWindow):
         self.shortcutExit = QShortcut(QKeySequence("F10"), self)
         self.shortcutFullscreen = QShortcut(QKeySequence("F11"), self)
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
+        # info window
+        self.infoWindowExists = False
         # go!
         self.init_ui()
         #print("Start")
@@ -156,6 +158,8 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event):
         if self.editorMode == EditorMode.Focus:
             self.set_focus_mode_margins()
+        if self.infoWindowExists:
+            self.resize_info_panel()
 
 
     # timers {
@@ -303,10 +307,10 @@ class MainWindow(QMainWindow):
         self.action_toggle_options_panel(ActivePanel.Options)
     
     def on_info_toggle(self):
-        self.action_toggle_options_panel(ActivePanel.Info)
-        #alert = QMessageBox()
-        #alert.setText('You clicked info button!')
-        #alert.exec_()
+        if self.infoWindow.isVisible():
+            self.infoWindow.hide()
+        else:
+            self.infoWindow.show()
     # }
 
 
@@ -397,6 +401,25 @@ class MainWindow(QMainWindow):
         self.switchBoard.setFixedHeight(0)
     # }
 
+
+
+    # info panel {
+    def build_info_panel(self):
+        self.infoWindow = QWidget(self)
+        #
+        self.infoWindow.hide()
+        self.infoWindowExists = True
+        self.resizeEvent(None)
+
+    def resize_info_panel(self):
+        max_width_ip = 700
+        max_height_ip = 500
+
+        left_shift = int((self.width() - max_width_ip) /2) 
+        top_shift = int((self.height() - max_height_ip) /2)
+
+        self.infoWindow.setGeometry(left_shift, top_shift, max_width_ip, max_height_ip)
+    # }
 
 
 
@@ -511,6 +534,7 @@ class MainWindow(QMainWindow):
         self.setup_app()
         self.prepare_timers()
         self.setCentralWidget(self.hMainWindow)
+        self.build_info_panel()
     # }
 
 def main():
