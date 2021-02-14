@@ -27,6 +27,8 @@ from hb_dir import Directory
 from hb_db import Database
 from hb_style import Stylist
 
+from dialogs.info.window import InfoWindow
+
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
@@ -372,51 +374,7 @@ class MainWindow(QMainWindow):
     # info panel {
     def build_info_panel(self):
         self.infoWindow = QWidget(self)
-        self.infoWindow.setStyleSheet("QWidget{border: 1px dotted silver;}")
-        infoLayout = QVBoxLayout()
-        infoLayout.setContentsMargins(20, 20, 20, 20)
-        
-        icon = QLabel()
-        icon.setFixedWidth(80)
-        
-        myPixmap = QtGui.QPixmap(self.directory.get_resource_dir() + 'icon.png')
-        myScaledPixmap = myPixmap.scaled(icon.size(), QtCore.Qt.KeepAspectRatio)
-        icon.setPixmap(myScaledPixmap)
-
-        about = QLabel()
-        about.setText("""
-        This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
-        Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
-        """
-        )
-        about.setOpenExternalLinks(True)
-        about.setWordWrap(True)
-
-        shortcuts = QLabel()
-        shortcuts.setText("""
-        F1 - Show this info<br />
-        F9 - Show settings board<br />
-        F10 - Save all notebooks and quit<br />
-        <br />
-        F2 - Focus on main note<br />
-        F3 - Focus on side note<br />
-        <br />
-        F7 - Switch between light and dark theme<br />
-        F8 - Switch between normal and focus mode<br />
-        F11 - Switch to fullscreen<br />
-        <br />
-        Ctrl+S - Save all notebooks
-        """
-        )
-
-        infoLayout.addWidget(icon)
-        infoLayout.addWidget(about)
-        infoLayout.addWidget(shortcuts)
-        infoLayout.addStretch()
-
-        self.infoWindow.setLayout(infoLayout)
-
-        self.infoWindow.hide()
+        info = InfoWindow(self.infoWindow)
         self.infoWindowExists = True
         self.resizeEvent(None)
 
