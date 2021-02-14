@@ -28,11 +28,18 @@ from hb_db import Database
 from hb_style import Stylist
 
 from dialogs.info.window import InfoWindow
+from dialogs.switch.window import FolderSwitch
+from classes.context import *
 
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.context = Context()
+
+        self.infoWindow = None
+        self.folderSwitch = None
 
         self.hMainWindow = QFrame()
         self.marginWidth = 0
@@ -74,14 +81,13 @@ class MainWindow(QMainWindow):
         self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
         self.shortcutMain = QShortcut(QKeySequence("F2"), self)
         self.shortcutSide = QShortcut(QKeySequence("F3"), self)
+        self.shortcutSwitch = QShortcut(QKeySequence("F4"), self)
         self.shortcutTheme = QShortcut(QKeySequence("F7"), self)
         self.shortcutMode = QShortcut(QKeySequence("F8"), self)
         self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
         self.shortcutExit = QShortcut(QKeySequence("F10"), self)
         self.shortcutFullscreen = QShortcut(QKeySequence("F11"), self)
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
-        # info window
-        self.infoWindowExists = False
         # go!
         self.init_ui()
         #print("Start")
@@ -148,13 +154,6 @@ class MainWindow(QMainWindow):
             self.mainPage.setViewportMargins(margin, 20, margin, 20)
             self.marginWidth = margin
     # }
-
-    def resizeEvent(self, event):
-        if self.editorMode == EditorMode.Focus:
-            self.set_focus_mode_margins()
-        if self.infoWindowExists:
-            self.resize_info_panel()
-
 
     # timers {
     def prepare_timers(self):
@@ -233,6 +232,14 @@ class MainWindow(QMainWindow):
         self.save_window_position()
         self.action_save()
         event.accept()
+
+    def resizeEvent(self, event):
+        if self.editorMode == EditorMode.Focus:
+            self.set_focus_mode_margins()
+        if not (self.infoWindow is None):
+            self.resize_info_panel()
+        if not (self.folderSwitch is None):
+            self.resize_folder_switch()
     # }
 
 
@@ -300,6 +307,12 @@ class MainWindow(QMainWindow):
             self.infoWindow.hide()
         else:
             self.infoWindow.show()
+
+    def on_folder_switch(self):
+        if self.folderSwitch.isVisible():
+            self.folderSwitch.hide()
+        else:
+            self.folderSwitch.show()
     # }
 
 
@@ -390,6 +403,24 @@ class MainWindow(QMainWindow):
 
 
 
+    # switch folder {
+    def build_folder_switch(self):
+        self.folderSwitch = QWidget(self)
+        switch = FolderSwitch(self.folderSwitch)
+        self.resizeEvent(None)
+
+    def resize_folder_switch(self):
+        maxw = 700
+        maxh = 500
+
+        left_shift = int((self.width() - maxw) /2) 
+        top_shift = int((self.height() - maxh) /2)
+
+        self.folderSwitch.setGeometry(left_shift, top_shift, maxw, maxh)
+    # }
+
+
+
     # app {
     def stack_gui_elements(self):
         self.stack_book_elements()
@@ -453,6 +484,7 @@ class MainWindow(QMainWindow):
         self.shortcutSave.activated.connect(self.action_save)
         self.shortcutMain.activated.connect(self.action_focus_main)
         self.shortcutSide.activated.connect(self.action_focus_side)
+        self.shortcutSwitch.activated.connect(self.on_folder_switch)
         self.shortcutInfo.activated.connect(self.on_info_toggle)
         self.shortcutSetup.activated.connect(self.on_settings_toggle)
         self.shortcutHide.activated.connect(self.hide_all_panels)
@@ -491,6 +523,7 @@ class MainWindow(QMainWindow):
         self.prepare_timers()
         self.setCentralWidget(self.hMainWindow)
         self.build_info_panel()
+        self.build_folder_switch()
     # }
 
 def main():

@@ -15,5 +15,7 @@ shortcuts_information = """
     F8 - Switch between normal and focus mode<br />
     F11 - Switch to fullscreen<br />
     <br />
+    F4 - select notebook
+    <br />
     Ctrl+S - Save all notebooks
     """

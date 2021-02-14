@@ -4,7 +4,7 @@
 
 + fullscreen
 - create different notebooks
-- frame for full app info, version and help
++ frame for full app info, version and help
 - special window for notebooks and context switch
 
 ## Version 0.8

@@ -56,4 +56,5 @@ The beautiful Hummingbird logo is made by [Freepik](https://www.flaticon.com/aut
 - Editor now has dark theme and focus mode, but only theme is remembered in database.
 
 #### Ver. 0.7
+
 - 
