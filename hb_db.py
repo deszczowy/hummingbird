@@ -1,8 +1,11 @@
 from PyQt5.QtSql import (QSqlDatabase, QSqlQuery)
+from PyQt5.QtGui import (QStandardItem, QStandardItemModel)
 
 from hb_dir import Directory
 from hb_sql import Sql
 from hb_version import VersionInfo
+
+from classes.items.folder import *
 
 class Database():
 
@@ -206,3 +209,22 @@ class Database():
                 res = default_value
 
         return res
+
+    def get_folder_model(self):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :GET FOLDER")
+            return False
+        
+        query = QSqlQuery()
+        query.exec_("SELECT 1, label FROM folder")
+
+        model = QStandardItemModel()
+        while query.next():
+            item = QStandardItem(query.value(1))
+            item.folder_id = query.value(0)
+            model.appendRow(item)
+
+        return model
