@@ -5,7 +5,7 @@ from PyQt5.QtGui import QKeySequence, QPixmap
 from PyQt5.QtCore import QModelIndex
 
 from PyQt5.QtWidgets import (
-    QVBoxLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QListView
+    QVBoxLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QListView, QInputDialog
 )
 
 from hb_dir import Directory
@@ -53,6 +53,7 @@ class FolderSwitch(QWidget):
 
         self.button_cancel.clicked.connect(self.cancel)
         self.button_ok.clicked.connect(self.ok)
+        self.button_add.clicked.connect(self.add)
 
         # stack
 
@@ -75,3 +76,11 @@ class FolderSwitch(QWidget):
     def ok(self):
         self.main.parent().load_folder(self.selected_folder)
         self.main.hide()
+
+    def add(self):
+        new_folder, ok = QInputDialog.getText(self, 'Hummingbird', 'New notebook name:')
+        if ok:
+            db = Database()
+            db.insert_folder(str(new_folder))
+            self.folders.setModel(db.get_folder_model())
+        

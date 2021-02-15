@@ -219,7 +219,7 @@ class Database():
             return False
         
         query = QSqlQuery()
-        query.exec_("SELECT 1, label FROM folder")
+        query.exec_("SELECT id, label FROM folder")
 
         model = QStandardItemModel()
         while query.next():
@@ -228,3 +228,20 @@ class Database():
             model.appendRow(item)
 
         return model
+
+    def insert_folder(self, folder_name):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :SAVE")
+            return False
+
+        query = QSqlQuery()
+        query.prepare(
+        """INSERT INTO folder (id, label) values (
+            (SELECT IFNULL(MAX(id),0) +1 FROM folder), :label
+        );""")
+                    
+        query.bindValue(":label", folder_name)
+        query.exec_()
