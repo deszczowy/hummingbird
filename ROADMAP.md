@@ -3,7 +3,7 @@
 ## Version 0.7
 
 + fullscreen
-- create different notebooks
++ create different notebooks
 + frame for full app info, version and help
 - special window for notebooks and context switch
 

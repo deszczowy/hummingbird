@@ -1,5 +1,4 @@
 from PyQt5.QtSql import (QSqlDatabase, QSqlQuery)
-from PyQt5.QtGui import (QStandardItem, QStandardItemModel)
 
 from hb_dir import Directory
 from hb_sql import Sql
@@ -237,7 +236,7 @@ class Database():
         query = QSqlQuery()
         query.exec_("SELECT id, label FROM folder")
 
-        model = QStandardItemModel()
+        model = BasicItemModel()
         while query.next():
             item = QStandardItem(query.value(1))
             item.folder_id = query.value(0)
