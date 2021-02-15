@@ -28,13 +28,13 @@ class Database():
 
         self.update()
 
-    def save_notebook(self, content, side):
+    def save_notebook(self, content, side, folder_id):
         main_indicator = -1
         if side:
-            self.archive_side_notebook()
+            self.archive_side_notebook(folder_id)
             main_indicator = 0
         else:
-            self.archive_main_notebook()
+            self.archive_main_notebook(folder_id)
             main_indicator = 1
 
         db = QSqlDatabase.database()
@@ -47,20 +47,22 @@ class Database():
         query = QSqlQuery()
         query.prepare(
         """INSERT INTO notebook (id, folder, content, version, save_time, main_page, archived) values (
-            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 1,
+            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
+            :folder,
             :content,
-            (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE main_page = :mpage),
+            (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE main_page = :mpage AND folder = :folder),
             datetime('now','localtime'),
             :mpage, 0
         );""")
-                    
+
+        query.bindValue(":folder", folder_id)   
         query.bindValue(":content", content)
         query.bindValue(":mpage", main_indicator)
         query.exec_()
 
-        self.remove_old_versions(main_indicator)
+        self.remove_old_versions(main_indicator, folder_id)
 
-    def remove_old_versions(self, side):
+    def remove_old_versions(self, side, folder_id):
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
@@ -69,11 +71,12 @@ class Database():
             return False
         
         query = QSqlQuery()
-        query.prepare("delete from notebook where main_page = :side and version <= (select max(version) from notebook where main_page = :side) -40;")
+        query.prepare("DELETE FROM notebook WHERE folder = :folder AND main_page = :side AND version <= (SELECT max(version) FROM notebook WHERE main_page = :side AND folder = :folder) -40;")
+        query.bindValue(":folder", folder_id)
         query.bindValue(":side", side)
         query.exec_()
 
-    def archive_main_notebook(self):
+    def archive_main_notebook(self, folder_id):
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
@@ -81,9 +84,12 @@ class Database():
             print("NOT OPEN :ARCH M")
             return False
 
-        QSqlQuery().exec_("UPDATE notebook SET archived = 1 WHERE main_page = 1")
+        query = QSqlQuery()
+        query.prepare("UPDATE notebook SET archived = 1 WHERE main_page = 1 AND folder = :folder")
+        query.bindValue(":folder", folder_id)
+        query.exec_()
 
-    def archive_side_notebook(self):
+    def archive_side_notebook(self, folder_id):
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
@@ -91,9 +97,13 @@ class Database():
             print("NOT OPEN :ARCH S")
             return False
 
-        QSqlQuery().exec_("UPDATE notebook SET archived = 1 WHERE main_page = 0")
+        query = QSqlQuery()
+        query.prepare("UPDATE notebook SET archived = 1 WHERE main_page = 0 AND folder = :folder")
+        query.bindValue(":folder", folder_id)
+        query.exec_()
+        
 
-    def get_main_content(self):
+    def get_main_content(self, folder_id):
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
@@ -102,11 +112,14 @@ class Database():
             return False
 
         query = QSqlQuery()
-        query.exec_("SELECT content FROM notebook WHERE main_page = 1 AND archived = 0")
+        query.prepare("SELECT content FROM notebook WHERE main_page = 1 AND archived = 0 AND folder = :folder")
+        query.bindValue(":folder", folder_id)
+        query.exec_()
         while query.next():
             return query.value(0)
+        return ""
         
-    def get_side_content(self):
+    def get_side_content(self, folder_id):
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
@@ -115,9 +128,12 @@ class Database():
             return False
 
         query = QSqlQuery()
-        query.exec_("SELECT content FROM notebook WHERE main_page = 0 AND archived = 0")
+        query.prepare("SELECT content FROM notebook WHERE main_page = 0 AND archived = 0 AND folder = :folder")
+        query.bindValue(":folder", folder_id)
+        query.exec_()
         while query.next():
             return query.value(0)
+        return ""
 
     def get_database_version(self):
         db = QSqlDatabase.database()

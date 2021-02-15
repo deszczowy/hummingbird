@@ -180,12 +180,12 @@ class MainWindow(QMainWindow):
         saved = False
 
         if self.mainPage.document().isModified():
-            self.notes.save_main_notes_to_db(self.mainPage.toPlainText())
+            self.notes.save_main_notes_to_db(self.mainPage.toPlainText(), self.context.active_folder)
             self.mainPage.document().setModified(False)
             saved = True
 
         if self.sideNotes.document().isModified():
-            self.notes.save_side_notes_to_db(self.sideNotes.toPlainText())
+            self.notes.save_side_notes_to_db(self.sideNotes.toPlainText(), self.context.active_folder)
             self.sideNotes.document().setModified(False)
             saved = True
         
@@ -268,14 +268,15 @@ class MainWindow(QMainWindow):
         self.desktop.setLayout(self.binding)
     
     def load_notes_contents(self):
-        self.mainPage.setPlainText(self.notes.get_main_notes_from_db())
-        self.sideNotes.setPlainText(self.notes.get_side_notes_from_db())
+        self.mainPage.setPlainText(self.notes.get_main_notes_from_db(self.context.active_folder))
+        self.sideNotes.setPlainText(self.notes.get_side_notes_from_db(self.context.active_folder))
     # }
 
 
     def load_folder(self, folder):
-        print("Load")
-        print(folder)
+        if folder != self.context.active_folder:
+            self.context.active_folder = folder
+            self.load_notes_contents()
 
     # status {
     def prepare_status_board(self):
