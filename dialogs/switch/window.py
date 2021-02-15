@@ -45,7 +45,9 @@ class FolderSwitch(QWidget):
         self.button_ok = QPushButton("OK")
         self.button_add = QPushButton("Add")
         self.button_cancel = QPushButton("Cancel")
+        self.button_edit = QPushButton("Change name")
         buttons_layout.addWidget(self.button_add)
+        buttons_layout.addWidget(self.button_edit)
         buttons_layout.addStretch()
         buttons_layout.addWidget(self.button_ok)
         buttons_layout.addWidget(self.button_cancel)
@@ -54,6 +56,7 @@ class FolderSwitch(QWidget):
         self.button_cancel.clicked.connect(self.cancel)
         self.button_ok.clicked.connect(self.ok)
         self.button_add.clicked.connect(self.add)
+        self.button_edit.clicked.connect(self.edit)
 
         # stack
 
@@ -82,5 +85,12 @@ class FolderSwitch(QWidget):
         if ok:
             db = Database()
             db.insert_folder(str(new_folder))
+            self.folders.setModel(db.get_folder_model())
+
+    def edit(self):
+        new_name, ok = QInputDialog.getText(self, 'Hummingbird', 'New notebook name:')
+        if ok:
+            db = Database()
+            db.update_folder(self.selected_folder, str(new_name))
             self.folders.setModel(db.get_folder_model())
         

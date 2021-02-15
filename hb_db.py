@@ -249,7 +249,7 @@ class Database():
         db.setDatabaseName(self.name)
 
         if not db.open():
-            print("NOT OPEN :SAVE")
+            print("NOT OPEN :INS FOLDER")
             return False
 
         query = QSqlQuery()
@@ -259,4 +259,18 @@ class Database():
         );""")
                     
         query.bindValue(":label", folder_name)
+        query.exec_()
+
+    def update_folder(self, folder_id, new_name):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :UPD FOLDER")
+            return False
+
+        query = QSqlQuery()
+        query.prepare("UPDATE folder SET label = :label WHERE id = :folder;")
+        query.bindValue(":label", new_name)
+        query.bindValue(":folder", folder_id)
         query.exec_()
