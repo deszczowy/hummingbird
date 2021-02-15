@@ -273,7 +273,9 @@ class MainWindow(QMainWindow):
     # }
 
 
-
+    def load_folder(self, folder):
+        print("Load")
+        print(folder)
 
     # status {
     def prepare_status_board(self):

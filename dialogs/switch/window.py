@@ -17,6 +17,8 @@ class FolderSwitch(QWidget):
 
         super(FolderSwitch, self).__init__(main_widget)
 
+        self.selected_folder = 0
+
         self.main = main_widget
 
         main_widget.setStyleSheet("QWidget{background-color: #f5f5f5;}")
@@ -32,6 +34,7 @@ class FolderSwitch(QWidget):
 
         header = QLabel()
         header.setText("Select notebook:")
+        header.setStyleSheet("font-size: 20px;")
 
         self.folders = QListView()
         self.folders.setModel(Database().get_folder_model())
@@ -49,6 +52,7 @@ class FolderSwitch(QWidget):
         buttons.setLayout(buttons_layout)
 
         self.button_cancel.clicked.connect(self.cancel)
+        self.button_ok.clicked.connect(self.ok)
 
         # stack
 
@@ -63,7 +67,11 @@ class FolderSwitch(QWidget):
     
     def select_folder(self, index):
         item = self.folders.model().itemFromIndex(index)
-        print(item.folder_id)
+        self.selected_folder = item.folder_id
 
     def cancel(self):
+        self.main.hide()
+
+    def ok(self):
+        self.main.parent().load_folder(self.selected_folder)
         self.main.hide()
