@@ -249,6 +249,7 @@ class MainWindow(QMainWindow):
     def prepare_book(self):
         self.set_book_margins()
         self.stack_book_elements()
+        self.load_context()
         self.load_notes_contents()
 
     def set_book_margins(self):
@@ -267,14 +268,24 @@ class MainWindow(QMainWindow):
         self.binding.addWidget(self.sideNotes)
         self.desktop.setLayout(self.binding)
     
+    def load_context(self):
+        source = Database().get_value("folder_source", "LOCAL")
+        self.context.source_local = source == "LOCAL"
+        self.context.active_folder = int(Database().get_value("folder_opened", "1"))
+
     def load_notes_contents(self):
-        self.mainPage.setPlainText(self.notes.get_main_notes_from_db(self.context.active_folder))
-        self.sideNotes.setPlainText(self.notes.get_side_notes_from_db(self.context.active_folder))
+        if self.context.source_local:
+            self.mainPage.setPlainText(self.notes.get_main_notes_from_db(self.context.active_folder))
+            self.sideNotes.setPlainText(self.notes.get_side_notes_from_db(self.context.active_folder))
     # }
 
 
     def load_folder(self, folder):
         if folder != self.context.active_folder:
+            self.action_save()
+            db = Database()
+            db.store_value("folder_opened", folder)
+            db.store_value("folder_source", "LOCAL")
             self.context.active_folder = folder
             self.load_notes_contents()
 
