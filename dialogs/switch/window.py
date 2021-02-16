@@ -39,6 +39,10 @@ class FolderSwitch(QWidget):
         self.folders = QListView()
         self.folders.setModel(Database().get_folder_model())
         self.folders.clicked[QModelIndex].connect(self.select_folder)
+        self.folders.setStyleSheet("""
+            QListView{background-color: #fff;} 
+            QListView::item{padding: 7px;}
+        """)
 
         buttons = QWidget()
         buttons_layout = QHBoxLayout()
