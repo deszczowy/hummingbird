@@ -6,7 +6,7 @@ This is a little notebook, with two visible editors. First one for main long not
 
 Current version is `0.7`
 
-![Hummingbird main window](/res/screenshot.png)
+![Hummingbird main window](/res/screenshot_01.png)
 
 ## How to run
 
@@ -20,6 +20,7 @@ In this version there are two main features:
 - Autosave
 - Dark theme
 - Focus mode
+- Multiple notebooks
 
 ## Keyboard shortcuts
 
@@ -28,6 +29,7 @@ You can work with Hummingbird using only keyboard. Available shortcuts are liste
 - `F1`: show info panel
 - `F2`: focus on main note
 - `F3`: focus on side note
+- `F4`: switch notebooks
 - `F7`: switch between light and dark theme
 - `F8`: switch between normal and focus editing mode
 - `F9`: show settings panel
