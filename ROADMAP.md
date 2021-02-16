@@ -1,12 +1,5 @@
 # Hummingbird Editor Roadmap
 
-## Version 0.7
-
-+ fullscreen
-+ create different notebooks
-+ frame for full app info, version and help
-- special window for notebooks and context switch
-
 ## Version 0.8
 
 - mode and theme switches in settings panel
