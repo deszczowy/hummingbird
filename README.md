@@ -4,7 +4,7 @@
 
 This is a little notebook, with two visible editors. First one for main long notes. Second one for easy accessible additional side notes.
 
-Current version is `0.7`
+Current version is `0.8`
 
 ![Hummingbird main window](/res/screenshot_01.png)
 
