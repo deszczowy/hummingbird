@@ -36,11 +36,15 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # local 
         self.context = Context()
 
+        # external windows
         self.infoWindow = None
         self.folderSwitch = None
 
+        #
+        # code to reorganize
         self.hMainWindow = QFrame()
         self.marginWidth = 0
         self.editorMode = EditorMode.Normal
@@ -67,6 +71,7 @@ class MainWindow(QMainWindow):
         self.statusBoard = QFrame()
         self.statusLayout = QHBoxLayout()
         self.messageBoard = QLabel()
+        self.infoBoard = QLabel()
         self.toggleSettingsButton = QPushButton()
         # settings
         self.switchBoard = QFrame()
@@ -300,6 +305,7 @@ class MainWindow(QMainWindow):
 
     def stack_status_elements(self):
         self.statusLayout.addWidget(self.toggleSettingsButton)
+        self.statusLayout.addWidget(self.infoBoard)
         self.statusLayout.addWidget(self.messageBoard)
         self.statusLayout.setContentsMargins(0, 0, 0, 0)
         self.statusLayout.addSpacing(0)
@@ -311,6 +317,9 @@ class MainWindow(QMainWindow):
         self.toggleSettingsButton.setFixedWidth(70)
         self.toggleSettingsButton.clicked.connect(self.on_settings_toggle)
 
+        self.infoBoard.setText("F1 - Info   F4 - Switch notebooks")
+        self.infoBoard.setStyleSheet("font-size:10px;")
+        self.infoBoard.setAlignment(QtCore.Qt.AlignLeft)
         self.messageBoard.setAlignment(QtCore.Qt.AlignRight)
 
     def on_settings_toggle(self):
@@ -395,8 +404,6 @@ class MainWindow(QMainWindow):
         self.optionsBoard.setFixedHeight(0)
         self.switchBoard.setFixedHeight(0)
     # }
-
-
 
     # info panel {
     def build_info_panel(self):
