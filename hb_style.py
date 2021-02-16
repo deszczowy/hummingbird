@@ -170,15 +170,3 @@ class Stylist():
             return ".QFrame {border:0px;} QPushButton {color: #252525;}"
         else:
             return ".QFrame {border:0px;} QPushButton {color: silver;}"
-
-
-    def get_shortcut_info_style_sheet(self, theme):
-        if theme == EditorTheme.Dark:
-            return self.get_shortcut_info_style_sheet_dark()
-        else:
-            return self.get_shortcut_info_style_sheet_light()
-
-    def get_shortcut_info_style_sheet_light(self):
-        return "line-height:0px; font-size:10px; font-family:mono; width:100%; text-align:center; color:silver;"
-    def get_shortcut_info_style_sheet_dark(self):
-        return "line-height:0px; font-size:10px; font-family:mono; width:100%; text-align:center; color:#353535;"

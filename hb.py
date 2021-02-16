@@ -27,15 +27,29 @@ from hb_dir import Directory
 from hb_db import Database
 from hb_style import Stylist
 
+from dialogs.info.window import InfoWindow
+from dialogs.switch.window import FolderSwitch
+from classes.context import *
+
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # local 
+        self.context = Context()
+
+        # external windows
+        self.infoWindow = None
+        self.folderSwitch = None
+
+        #
+        # code to reorganize
         self.hMainWindow = QFrame()
         self.marginWidth = 0
         self.editorMode = EditorMode.Normal
         self.editorTheme = EditorTheme.Dark
+        self.wasMaximized = False
         # timer
         self.tic = 0
         self.timer = QTimer(self)
@@ -57,8 +71,8 @@ class MainWindow(QMainWindow):
         self.statusBoard = QFrame()
         self.statusLayout = QHBoxLayout()
         self.messageBoard = QLabel()
+        self.infoBoard = QLabel()
         self.toggleSettingsButton = QPushButton()
-        self.toggleAppInfoButton = QPushButton()
         # settings
         self.switchBoard = QFrame()
         self.switchLayout = QVBoxLayout()
@@ -67,28 +81,32 @@ class MainWindow(QMainWindow):
         self.fontSizeLabel = QLabel()
         self.fontSizeValue = QLineEdit()
         self.optionsLayout = QGridLayout()
-        # - info board
-        self.infoBoard = QFrame()
-        self.infoLayout = QHBoxLayout()
-        self.aboutLabel = QLabel()
-        self.shortcutInfoLabel = QLabel()
-        self.iconLabel = QLabel()
         # keys
         self.shortcutSave = QShortcut(QKeySequence("Ctrl+S"), self)
         self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
         self.shortcutMain = QShortcut(QKeySequence("F2"), self)
         self.shortcutSide = QShortcut(QKeySequence("F3"), self)
+        self.shortcutSwitch = QShortcut(QKeySequence("F4"), self)
         self.shortcutTheme = QShortcut(QKeySequence("F7"), self)
         self.shortcutMode = QShortcut(QKeySequence("F8"), self)
         self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
         self.shortcutExit = QShortcut(QKeySequence("F10"), self)
+        self.shortcutFullscreen = QShortcut(QKeySequence("F11"), self)
         self.shortcutHide = QShortcut(QKeySequence("Esc"), self)
         # go!
         self.init_ui()
         #print("Start")
 
-    def get_theme(self):
-        return self.editorTheme
+    def toggle_fullscreen(self):
+        if self.isFullScreen():
+            if self.wasMaximized:
+                self.showNormal()
+                self.showMaximized()
+            else:
+                self.showNormal()
+        else:
+            self.wasMaximized = self.isMaximized()
+            self.showFullScreen()
 
     # editor themes {
     def read_theme_from_settings(self):
@@ -108,7 +126,6 @@ class MainWindow(QMainWindow):
     def set_editor_theme(self):
         self.sideNotes.setStyleSheet(self.stylist.get_side_notes_style_sheet(self.editorTheme))
         self.statusBoard.setStyleSheet(self.stylist.get_status_board_style_sheet(self.editorTheme))
-        self.setup_shortcut_list()
         self.setStyleSheet(self.stylist.get_style_sheet(self.editorTheme))
     # }
 
@@ -143,11 +160,6 @@ class MainWindow(QMainWindow):
             self.marginWidth = margin
     # }
 
-    def resizeEvent(self, event):
-        if self.editorMode == EditorMode.Focus:
-            self.set_focus_mode_margins()
-
-
     # timers {
     def prepare_timers(self):
         self.timer.timeout.connect(self.timer_tic)
@@ -173,12 +185,12 @@ class MainWindow(QMainWindow):
         saved = False
 
         if self.mainPage.document().isModified():
-            self.notes.save_main_notes_to_db(self.mainPage.toPlainText())
+            self.notes.save_main_notes_to_db(self.mainPage.toPlainText(), self.context.active_folder)
             self.mainPage.document().setModified(False)
             saved = True
 
         if self.sideNotes.document().isModified():
-            self.notes.save_side_notes_to_db(self.sideNotes.toPlainText())
+            self.notes.save_side_notes_to_db(self.sideNotes.toPlainText(), self.context.active_folder)
             self.sideNotes.document().setModified(False)
             saved = True
         
@@ -225,6 +237,14 @@ class MainWindow(QMainWindow):
         self.save_window_position()
         self.action_save()
         event.accept()
+
+    def resizeEvent(self, event):
+        if self.editorMode == EditorMode.Focus:
+            self.set_focus_mode_margins()
+        if not (self.infoWindow is None):
+            self.resize_info_panel()
+        if not (self.folderSwitch is None):
+            self.resize_folder_switch()
     # }
 
 
@@ -234,6 +254,7 @@ class MainWindow(QMainWindow):
     def prepare_book(self):
         self.set_book_margins()
         self.stack_book_elements()
+        self.load_context()
         self.load_notes_contents()
 
     def set_book_margins(self):
@@ -252,13 +273,26 @@ class MainWindow(QMainWindow):
         self.binding.addWidget(self.sideNotes)
         self.desktop.setLayout(self.binding)
     
+    def load_context(self):
+        source = Database().get_value("folder_source", "LOCAL")
+        self.context.source_local = source == "LOCAL"
+        self.context.active_folder = int(Database().get_value("folder_opened", "1"))
+
     def load_notes_contents(self):
-        self.mainPage.setPlainText(self.notes.get_main_notes_from_db())
-        self.sideNotes.setPlainText(self.notes.get_side_notes_from_db())
+        if self.context.source_local:
+            self.mainPage.setPlainText(self.notes.get_main_notes_from_db(self.context.active_folder))
+            self.sideNotes.setPlainText(self.notes.get_side_notes_from_db(self.context.active_folder))
     # }
 
 
-
+    def load_folder(self, folder):
+        if folder != self.context.active_folder:
+            self.action_save()
+            db = Database()
+            db.store_value("folder_opened", folder)
+            db.store_value("folder_source", "LOCAL")
+            self.context.active_folder = folder
+            self.load_notes_contents()
 
     # status {
     def prepare_status_board(self):
@@ -271,7 +305,7 @@ class MainWindow(QMainWindow):
 
     def stack_status_elements(self):
         self.statusLayout.addWidget(self.toggleSettingsButton)
-        self.statusLayout.addWidget(self.toggleAppInfoButton)
+        self.statusLayout.addWidget(self.infoBoard)
         self.statusLayout.addWidget(self.messageBoard)
         self.statusLayout.setContentsMargins(0, 0, 0, 0)
         self.statusLayout.addSpacing(0)
@@ -283,20 +317,25 @@ class MainWindow(QMainWindow):
         self.toggleSettingsButton.setFixedWidth(70)
         self.toggleSettingsButton.clicked.connect(self.on_settings_toggle)
 
-        self.toggleAppInfoButton.setText('\u25B3' + "Info" )
-        self.toggleAppInfoButton.setFixedWidth(70)
-        self.toggleAppInfoButton.clicked.connect(self.on_info_toggle)
-
+        self.infoBoard.setText("F1 - Info   F4 - Switch notebooks")
+        self.infoBoard.setStyleSheet("font-size:10px;")
+        self.infoBoard.setAlignment(QtCore.Qt.AlignLeft)
         self.messageBoard.setAlignment(QtCore.Qt.AlignRight)
 
     def on_settings_toggle(self):
         self.action_toggle_options_panel(ActivePanel.Options)
     
     def on_info_toggle(self):
-        self.action_toggle_options_panel(ActivePanel.Info)
-        #alert = QMessageBox()
-        #alert.setText('You clicked info button!')
-        #alert.exec_()
+        if self.infoWindow.isVisible():
+            self.infoWindow.hide()
+        else:
+            self.infoWindow.show()
+
+    def on_folder_switch(self):
+        if self.folderSwitch.isVisible():
+            self.folderSwitch.hide()
+        else:
+            self.folderSwitch.show()
     # }
 
 
@@ -305,31 +344,12 @@ class MainWindow(QMainWindow):
     # settings {
     def prepare_settings_board(self):
         self.set_settings_margins()
-        self.set_info_panel()
         self.set_settings_panel()
         self.stack_settings_elements()
 
     def set_settings_margins(self):
         self.switchLayout.setContentsMargins(0, 0, 0, 0)
         self.switchLayout.setSpacing(0)
-
-    def set_info_panel(self):
-        self.iconLabel.setFixedWidth(50)
-        
-        myPixmap = QtGui.QPixmap(self.directory.get_resource_dir() + 'icon.png')
-        myScaledPixmap = myPixmap.scaled(self.iconLabel.size(), QtCore.Qt.KeepAspectRatio)
-        self.iconLabel.setPixmap(myScaledPixmap)
-
-        self.aboutLabel.setText("""
-        This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
-        Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
-        """
-        )
-        self.aboutLabel.setOpenExternalLinks(True)
-        self.aboutLabel.setWordWrap(True)
-        self.infoLayout.addWidget(self.iconLabel)
-        self.infoLayout.addWidget(self.aboutLabel)
-        self.infoBoard.setLayout(self.infoLayout)
 
     def set_settings_panel(self):
         self.fontSizeLabel.setText("Font size")
@@ -377,16 +397,48 @@ class MainWindow(QMainWindow):
 
     def stack_settings_elements(self):
         self.switchLayout.addWidget(self.optionsBoard)
-        self.switchLayout.addWidget(self.infoBoard)
         self.switchBoard.setLayout(self.switchLayout)
         self.hide_all_panels()
 
     def hide_all_panels(self):
         self.optionsBoard.setFixedHeight(0)
-        self.infoBoard.setFixedHeight(0)
         self.switchBoard.setFixedHeight(0)
     # }
 
+    # info panel {
+    def build_info_panel(self):
+        self.infoWindow = QWidget(self)
+        info = InfoWindow(self.infoWindow)
+        self.infoWindowExists = True
+        self.resizeEvent(None)
+
+    def resize_info_panel(self):
+        max_width_ip = 700
+        max_height_ip = 500
+
+        left_shift = int((self.width() - max_width_ip) /2) 
+        top_shift = int((self.height() - max_height_ip) /2)
+
+        self.infoWindow.setGeometry(left_shift, top_shift, max_width_ip, max_height_ip)
+    # }
+
+
+
+    # switch folder {
+    def build_folder_switch(self):
+        self.folderSwitch = QWidget(self)
+        switch = FolderSwitch(self.folderSwitch)
+        self.resizeEvent(None)
+
+    def resize_folder_switch(self):
+        maxw = 700
+        maxh = 500
+
+        left_shift = int((self.width() - maxw) /2) 
+        top_shift = int((self.height() - maxh) /2)
+
+        self.folderSwitch.setGeometry(left_shift, top_shift, maxw, maxh)
+    # }
 
 
 
@@ -395,26 +447,15 @@ class MainWindow(QMainWindow):
         self.stack_book_elements()
         self.stack_status_elements()
         self.stack_settings_elements()
-        self.setup_shortcut_list()
 
         self.appLayout.setContentsMargins(0, 0, 0, 0)
         self.appLayout.setSpacing(0)
         self.appLayout.addWidget(self.desktop)
         self.appLayout.addWidget(self.statusBoard)
         self.appLayout.addWidget(self.switchBoard)
-        self.appLayout.addWidget(self.shortcutInfoLabel)
+        #self.appLayout.addWidget(self.shortcutInfoLabel)
         self.hMainWindow.setLayout(self.appLayout)
     
-    def setup_shortcut_list(self):
-        self.shortcutInfoLabel.setText(
-        "<p style=\"" + self.stylist.get_shortcut_info_style_sheet(self.editorTheme) + "\">" +
-        "[F1 info]             [F9 settings]         [ESC hide panels] " +
-        "[F10 quit]   [F2 main note]        [F3 side note] " +
-        "[F7 themes ] [F8 focus] " +
-        "[Ctrl+S save all]" +
-        "</p>"
-        )   
-
     def setup_app(self):
         self.read_theme_from_settings()
         self.set_editor_theme()
@@ -464,12 +505,14 @@ class MainWindow(QMainWindow):
         self.shortcutSave.activated.connect(self.action_save)
         self.shortcutMain.activated.connect(self.action_focus_main)
         self.shortcutSide.activated.connect(self.action_focus_side)
+        self.shortcutSwitch.activated.connect(self.on_folder_switch)
         self.shortcutInfo.activated.connect(self.on_info_toggle)
         self.shortcutSetup.activated.connect(self.on_settings_toggle)
         self.shortcutHide.activated.connect(self.hide_all_panels)
         self.shortcutExit.activated.connect(self.action_terminate)
         self.shortcutTheme.activated.connect(self.switch_editor_theme)
         self.shortcutMode.activated.connect(self.switch_editor_mode)
+        self.shortcutFullscreen.activated.connect(self.toggle_fullscreen)
 
     def save_window_position(self):
         if not self.isMaximized():
@@ -500,6 +543,8 @@ class MainWindow(QMainWindow):
         self.setup_app()
         self.prepare_timers()
         self.setCentralWidget(self.hMainWindow)
+        self.build_info_panel()
+        self.build_folder_switch()
     # }
 
 def main():
