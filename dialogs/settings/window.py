@@ -45,38 +45,32 @@ class SettingsView(QWidget):
         page_layout = QHBoxLayout()
         page.setLayout(page_layout)
 
-        column_left = QWidget()
-        column_left_layout = QVBoxLayout()
-        column_left.setLayout(column_left_layout)
+        column_left = QVBoxLayout()
+        column_right = QVBoxLayout()
 
-        column_right = QWidget()
-        column_right_layout = QVBoxLayout()
-        column_right.setLayout(column_right_layout)
-
-        page_layout.addWidget(column_left)
-        page_layout.addWidget(column_right)
+        page_layout.addLayout(column_left)
+        page_layout.addLayout(column_right)
 
         # controls
 
         self.font_size_label = QLabel()
         self.font_size_label.setText("Font size")
-        self.font_size_label.setAlignment(QtCore.Qt.AlignRight)
-        self.font_size_label.setFixedHeight(20)
-        self.font_size_label.setFixedWidth(100)
-        column_left_layout.addWidget(self.font_size_label)
+        self.font_size_label.setAlignment(QtCore.Qt.AlignLeft)
+        column_left.addWidget(self.font_size_label)
 
         self.font_size_value = QLineEdit()
         self.font_size_value.setText(Database().get_value("text_size", "13"))
         self.font_size_value.setInputMask("D9")
-        self.font_size_value.setFixedHeight(30)
-        self.font_size_value.setFixedWidth(70)
         self.font_size_value.textChanged.connect(self.apply_font_size)
-        column_left_layout.addWidget(self.font_size_value)
+        column_left.addWidget(self.font_size_value)
+
+        self.label = QLabel("Right side")
+        column_right.addWidget(self.label)
 
         # fill the gaps
 
-        column_left_layout.addStretch()
-        column_right_layout.addStretch()
+        column_left.addStretch()
+        column_right.addStretch()
 
         # finalization
 
