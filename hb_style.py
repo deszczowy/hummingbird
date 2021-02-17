@@ -21,11 +21,6 @@ class Stylist():
                 border: 1px dotted #353535;
             }
 
-            QPushButton {
-                font-size:12px; 
-                color: #353535;
-            }
-
             QScrollBar:vertical
             {
                     border: 0;
@@ -59,6 +54,17 @@ class Stylist():
             {
                 background: none;
             }
+
+            QPushButton
+            {
+                font-size:12px;
+                border: 1px solid silver; 
+                min-width: 70px; 
+                min-height: 30px; 
+                padding: 5px; 
+                background-color: #000; 
+                color: silver;
+            }
         """
     def get_style_sheet_light(self):
         return """
@@ -71,11 +77,6 @@ class Stylist():
 
             QLineEdit {
                 border: 1px dotted silver;
-            }
-
-            QPushButton {
-                font-size:12px; 
-                color: silver;
             }
 
             QScrollBar:vertical
@@ -120,6 +121,17 @@ class Stylist():
                 width:100%; 
                 text-align:center; 
                 color:silver;
+            }
+
+            QPushButton
+            {
+                font-size:12px;
+                border: 1px solid silver; 
+                min-width: 70px; 
+                min-height: 30px; 
+                padding: 5px; 
+                background-color: #fff; 
+                color: black;
             }
         """
 

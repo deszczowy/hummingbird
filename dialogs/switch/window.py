@@ -21,7 +21,7 @@ class FolderSwitch(QWidget):
 
         self.main = main_widget
 
-        main_widget.setStyleSheet("QWidget{background-color: #f5f5f5;} QPushButton{border: 1px solid silver; min-width: 70px; min-height: 30px; padding: 5px; background-color: #fff; color: black;}")
+        self.main.setStyleSheet("QWidget{background-color: #f5f5f5;}")
         switchLayout = QVBoxLayout()
         switchLayout.setContentsMargins(20, 20, 20, 20)
         

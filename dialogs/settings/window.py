@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import QKeySequence, QPixmap
 
 from PyQt5.QtWidgets import (
-    QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QWidget
+    QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QWidget, QPushButton
 )
 
 from hb_db import Database
@@ -17,7 +17,7 @@ class SettingsView(QWidget):
 
         self.main = settings_window_widget
 
-        self.main.setStyleSheet("QWidget{background-color: #efefef;}")
+        self.main.setStyleSheet("QWidget{background-color: #f5f5f5;}")
 
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(20, 20, 20, 20)
@@ -28,6 +28,16 @@ class SettingsView(QWidget):
         myPixmap = QtGui.QPixmap(Directory().get_resource_dir() + 'icon.png')
         myScaledPixmap = myPixmap.scaled(icon.size(), QtCore.Qt.KeepAspectRatio)
         icon.setPixmap(myScaledPixmap)
+
+        # buttons
+
+        buttons = QWidget()
+        buttons_layout = QHBoxLayout()
+        buttons.setLayout(buttons_layout)
+        button = QPushButton("OK")
+        button.clicked.connect(self.close)
+        buttons_layout.addStretch()
+        buttons_layout.addWidget(button)
 
         # sides
 
@@ -72,6 +82,7 @@ class SettingsView(QWidget):
 
         main_layout.addWidget(icon)
         main_layout.addWidget(page)
+        main_layout.addWidget(buttons)
 
         self.main.setLayout(main_layout)
         self.main.hide()
@@ -86,3 +97,5 @@ class SettingsView(QWidget):
         Database().store_value("text_size", pt)
         self.main.parent().update_font_size()
     
+    def close(self):
+        self.main.hide()

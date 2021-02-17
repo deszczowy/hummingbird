@@ -293,7 +293,7 @@ class MainWindow(QMainWindow):
     # status slots
     def setup_switch_buttons(self):
 
-        self.infoBoard.setText("F1 - Info   F4 - Switch notebooks")
+        self.infoBoard.setText("F1 - Info   F9 - settings    F4 - Switch notebooks")
         self.infoBoard.setStyleSheet("font-size:10px;")
         self.infoBoard.setAlignment(QtCore.Qt.AlignLeft)
         self.messageBoard.setAlignment(QtCore.Qt.AlignRight)
