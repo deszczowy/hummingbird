@@ -28,6 +28,7 @@ from hb_db import Database
 from hb_style import Stylist
 
 from dialogs.info.window import InfoWindow
+from dialogs.settings.window import SettingsView
 from dialogs.switch.window import FolderSwitch
 from classes.context import *
 
@@ -41,6 +42,7 @@ class MainWindow(QMainWindow):
 
         # external windows
         self.infoWindow = None
+        self.settingsWindow = None
         self.folderSwitch = None
 
         #
@@ -72,15 +74,6 @@ class MainWindow(QMainWindow):
         self.statusLayout = QHBoxLayout()
         self.messageBoard = QLabel()
         self.infoBoard = QLabel()
-        self.toggleSettingsButton = QPushButton()
-        # settings
-        self.switchBoard = QFrame()
-        self.switchLayout = QVBoxLayout()
-        # - settings board
-        self.optionsBoard = QFrame()
-        self.fontSizeLabel = QLabel()
-        self.fontSizeValue = QLineEdit()
-        self.optionsLayout = QGridLayout()
         # keys
         self.shortcutSave = QShortcut(QKeySequence("Ctrl+S"), self)
         self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
@@ -201,22 +194,6 @@ class MainWindow(QMainWindow):
     def action_publish_message(self, message):
         self.messageBoard.setText(message + " ") # with margin
     
-    def action_toggle_options_panel(self, sender):
-        if sender == self.activePanel:
-            self.activePanel = ActivePanel.Nothing
-        else:
-            self.activePanel = sender
-
-        self.hide_all_panels()
-
-        if self.activePanel != ActivePanel.Nothing:
-            self.switchBoard.setFixedHeight(60)
-
-        if sender == ActivePanel.Info:
-            self.infoBoard.setFixedHeight(60)
-        elif sender == ActivePanel.Options:
-            self.optionsBoard.setFixedHeight(60)
-
     def action_focus_main(self):
         self.mainPage.setFocus()
 
@@ -243,6 +220,8 @@ class MainWindow(QMainWindow):
             self.set_focus_mode_margins()
         if not (self.infoWindow is None):
             self.resize_info_panel()
+        if not (self.settingsWindow is None):
+            self.resize_settings_panel()
         if not (self.folderSwitch is None):
             self.resize_folder_switch()
     # }
@@ -304,7 +283,7 @@ class MainWindow(QMainWindow):
         self.statusLayout.setSpacing(0)
 
     def stack_status_elements(self):
-        self.statusLayout.addWidget(self.toggleSettingsButton)
+        
         self.statusLayout.addWidget(self.infoBoard)
         self.statusLayout.addWidget(self.messageBoard)
         self.statusLayout.setContentsMargins(0, 0, 0, 0)
@@ -313,9 +292,6 @@ class MainWindow(QMainWindow):
 
     # status slots
     def setup_switch_buttons(self):
-        self.toggleSettingsButton.setText('\u25B3' + "Options" ) # + '\u25BD'
-        self.toggleSettingsButton.setFixedWidth(70)
-        self.toggleSettingsButton.clicked.connect(self.on_settings_toggle)
 
         self.infoBoard.setText("F1 - Info   F4 - Switch notebooks")
         self.infoBoard.setStyleSheet("font-size:10px;")
@@ -323,7 +299,10 @@ class MainWindow(QMainWindow):
         self.messageBoard.setAlignment(QtCore.Qt.AlignRight)
 
     def on_settings_toggle(self):
-        self.action_toggle_options_panel(ActivePanel.Options)
+        if self.settingsWindow.isVisible():
+            self.settingsWindow.hide()
+        else:
+            self.settingsWindow.show()
     
     def on_info_toggle(self):
         if self.infoWindow.isVisible():
@@ -342,45 +321,9 @@ class MainWindow(QMainWindow):
 
 
     # settings {
-    def prepare_settings_board(self):
-        self.set_settings_margins()
-        self.set_settings_panel()
-        self.stack_settings_elements()
 
-    def set_settings_margins(self):
-        self.switchLayout.setContentsMargins(0, 0, 0, 0)
-        self.switchLayout.setSpacing(0)
-
-    def set_settings_panel(self):
-        self.fontSizeLabel.setText("Font size")
-        self.fontSizeLabel.setAlignment(QtCore.Qt.AlignRight)
-        self.fontSizeLabel.setFixedHeight(20)
-        self.fontSizeLabel.setFixedWidth(100)
-
-        self.fontSizeValue.setText(Database().get_value("text_size", "13"))
-        self.fontSizeValue.setInputMask("D9")
-        self.fontSizeValue.setFixedHeight(30)
-        self.fontSizeValue.setFixedWidth(70)
-        self.fontSizeValue.textChanged.connect(self.on_font_size_change)
-        
-
-        self.optionsLayout.addWidget(self.fontSizeLabel, 0, 0)
-        self.optionsLayout.addWidget(self.fontSizeValue, 0, 1)
-        self.optionsLayout.setRowStretch(2, 1) # stretching the next, empty row lead to keeping above rows not stretched
-        self.optionsLayout.setColumnStretch(2, 1)
-        self.optionsLayout.setColumnMinimumWidth(0, 100)
-        self.optionsLayout.setColumnMinimumWidth(1, 100)
-
-        self.optionsBoard.setLayout(self.optionsLayout)
-
-    def on_font_size_change(self):
-        size = self.fontSizeValue.text()
-        if size == "" or size =="0":
-            pt = 1
-        else:
-            pt = int(size)
-
-        Database().store_value("text_size", pt)
+    def update_font_size(self):
+        pt = int(Database().get_value("text_size", "13"))
 
         mainPageTextCursor = self.mainPage.textCursor()
         sideNoteTextCursor = self.sideNotes.textCursor()
@@ -394,22 +337,12 @@ class MainWindow(QMainWindow):
         self.sideNotes.setFontPointSize(pt)
         self.sideNotes.setTextCursor(sideNoteTextCursor)
         self.sideNotes.document().setModified(sideNoteModified)
-
-    def stack_settings_elements(self):
-        self.switchLayout.addWidget(self.optionsBoard)
-        self.switchBoard.setLayout(self.switchLayout)
-        self.hide_all_panels()
-
-    def hide_all_panels(self):
-        self.optionsBoard.setFixedHeight(0)
-        self.switchBoard.setFixedHeight(0)
     # }
 
-    # info panel {
+    # info dialog {
     def build_info_panel(self):
         self.infoWindow = QWidget(self)
         info = InfoWindow(self.infoWindow)
-        self.infoWindowExists = True
         self.resizeEvent(None)
 
     def resize_info_panel(self):
@@ -420,6 +353,22 @@ class MainWindow(QMainWindow):
         top_shift = int((self.height() - max_height_ip) /2)
 
         self.infoWindow.setGeometry(left_shift, top_shift, max_width_ip, max_height_ip)
+    # }
+
+    # settings dialog {
+    def build_settings_dialog(self):
+        self.settingsWindow = QWidget(self)
+        settings = SettingsView(self.settingsWindow)
+        self.resizeEvent(None)
+
+    def resize_settings_panel(self):
+        max_width_ip = 700
+        max_height_ip = 500
+
+        left_shift = int((self.width() - max_width_ip) /2) 
+        top_shift = int((self.height() - max_height_ip) /2)
+
+        self.settingsWindow.setGeometry(left_shift, top_shift, max_width_ip, max_height_ip)
     # }
 
 
@@ -446,14 +395,11 @@ class MainWindow(QMainWindow):
     def stack_gui_elements(self):
         self.stack_book_elements()
         self.stack_status_elements()
-        self.stack_settings_elements()
 
         self.appLayout.setContentsMargins(0, 0, 0, 0)
         self.appLayout.setSpacing(0)
         self.appLayout.addWidget(self.desktop)
         self.appLayout.addWidget(self.statusBoard)
-        self.appLayout.addWidget(self.switchBoard)
-        #self.appLayout.addWidget(self.shortcutInfoLabel)
         self.hMainWindow.setLayout(self.appLayout)
     
     def setup_app(self):
@@ -508,7 +454,6 @@ class MainWindow(QMainWindow):
         self.shortcutSwitch.activated.connect(self.on_folder_switch)
         self.shortcutInfo.activated.connect(self.on_info_toggle)
         self.shortcutSetup.activated.connect(self.on_settings_toggle)
-        self.shortcutHide.activated.connect(self.hide_all_panels)
         self.shortcutExit.activated.connect(self.action_terminate)
         self.shortcutTheme.activated.connect(self.switch_editor_theme)
         self.shortcutMode.activated.connect(self.switch_editor_mode)
@@ -538,12 +483,12 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(800, 600)
         self.prepare_book()
         self.prepare_status_board()
-        self.prepare_settings_board()
         self.stack_gui_elements()
         self.setup_app()
         self.prepare_timers()
         self.setCentralWidget(self.hMainWindow)
         self.build_info_panel()
+        self.build_settings_dialog()
         self.build_folder_switch()
     # }
 
