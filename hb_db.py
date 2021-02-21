@@ -274,3 +274,54 @@ class Database():
         query.bindValue(":label", new_name)
         query.bindValue(":folder", folder_id)
         query.exec_()
+
+    
+
+
+
+    def save_text(self, folder, sleeve, content):
+        
+        sleeve_id = int(sleeve)
+
+        query_text = """
+        INSERT INTO notebook (
+            id, 
+            folder, 
+            content, 
+            version, 
+            save_time, 
+            sleeve, 
+            archived
+        ) values (
+            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
+            :folder,
+            :content,
+            (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE sleeve = :sleeve AND folder = :folder),
+            datetime('now','localtime'),
+            :sleeve, 
+            0
+        );"""
+
+        #archive sleeve
+
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :SAVE NOTEBOOK")
+            return False
+
+        query = QSqlQuery()
+        query.prepare(query_text)
+
+        query.bindValue(":folder", folder_id)   
+        query.bindValue(":content", content)
+        query.bindValue(":sleeve", sleeve)
+        query.exec_()
+
+        # self.remove_old_versions(sleeve, folder_id)
+
+    def get_text(self, folder_id, sleeve):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+        return ""

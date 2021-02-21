@@ -73,7 +73,7 @@ class Stylist():
                 padding:0px; 
                 border:0px;
                 background-color: white;
-            } 
+            }
 
             QLineEdit {
                 border: 1px dotted silver;
@@ -149,7 +149,7 @@ class Stylist():
         """
     def get_side_notes_style_sheet_light(self):
         return """
-            border-left: 1px dashed black;
+            
         """
     def get_side_notes_style_focus(self, theme):
         if theme == EditorTheme.Dark:

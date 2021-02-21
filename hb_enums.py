@@ -12,3 +12,9 @@ class EditorMode(Enum):
 class EditorTheme(Enum):
     Light = 0
     Dark = 1
+
+class Component(Enum):
+    Notepad = 0
+    SideNotes = 1
+    ToDoList = 2
+    StatusBar = 3
