@@ -38,3 +38,6 @@ class StatusBar(QWidget):
 
     def publish(self, message):
         self.messages.setText(message + " ") # with margin
+
+    def clear(self):
+        self.messages.setText("")

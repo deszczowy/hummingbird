@@ -31,6 +31,7 @@ from dialogs.info.window import InfoWindow
 from dialogs.settings.window import SettingsView
 from dialogs.switch.window import FolderSwitch
 from classes.context import *
+from classes.timer import *
 from components.side import *
 from components.statusbar import *
 
@@ -52,13 +53,6 @@ class MainWindow(QMainWindow):
         # code to reorganize
         
         self.marginWidth = 0
-
-        # timer
-        self.tic = 0
-        self.timer = QTimer(self)
-        self.schedule = QTimer(self)
-
-        #self.init_ui()
 
     # main app creators
     def create_main_components(self):
@@ -101,6 +95,7 @@ class MainWindow(QMainWindow):
         self.version = VersionInfo() ## to context
         self.stylist = Stylist()
         self.directory = Directory()
+        self.timer = Timer(self)
 
     def create_side_components(self):
         self.sidenote = SideNotes(self)
@@ -304,6 +299,8 @@ class MainWindow(QMainWindow):
             self.notepad.load(self.context.source_folder)
             self.sidenote.load(self.context.source_folder)
 
+    def clear_status(self):
+        self.status_bar.clear()
 
 
 
@@ -328,24 +325,7 @@ class MainWindow(QMainWindow):
         if margin != self.marginWidth:
             self.mainPage.setViewportMargins(margin, 20, margin, 20)
             self.marginWidth = margin
-    # }
 
-    # timers {
-    def prepare_timers(self):
-        self.timer.timeout.connect(self.timer_tic)
-        self.schedule.timeout.connect(self.schedule_tic)
-        self.timer.start(1000)
-        self.schedule.start(7000)
-    
-    def timer_tic(self):
-        if self.tic > 0:
-            self.tic -= 1
-        if self.tic == 1:
-            self.messageBoard.setText("")
-
-    def schedule_tic(self):
-        self.action_save()
-    # }
 
 
 
@@ -458,12 +438,6 @@ class MainWindow(QMainWindow):
         Database().store_value("theme", theme)
 
 
-
-    def init_ui(self):
-        self.prepare_timers()
-        
-
-    # }
 
 def main():
     Database().create()
