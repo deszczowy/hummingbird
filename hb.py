@@ -43,6 +43,10 @@ class MainWindow(QMainWindow):
         self.create_backend()
         self.create_shortcuts()
         self.build_ui()
+        self.build_dialogs()
+        self.window_setup()
+        self.load_folder()
+        self.show_window()
 
         #
         # code to reorganize
@@ -54,19 +58,10 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.schedule = QTimer(self)
 
-       
-        
-        
-
-        # go!
-        self.init_ui()
-        #print("Start")
+        #self.init_ui()
 
     # main app creators
     def create_main_components(self):
-        # local 
-        self.context = Context()
-
         # main window
         self.window = QFrame()
         self.layout = QVBoxLayout()
@@ -75,6 +70,10 @@ class MainWindow(QMainWindow):
         self.infoWindow = None
         self.settingsWindow = None
         self.folderSwitch = None
+
+    def create_context(self):
+        self.context = Context()
+        self.context.load()
 
     def create_shortcuts(self):
         self.shortcutSave = QShortcut(QKeySequence("Ctrl+S"), self)
@@ -93,7 +92,6 @@ class MainWindow(QMainWindow):
     def create_flags(self):
         # enums
         self.editorMode = EditorMode.Normal
-        self.editorTheme = EditorTheme.Dark
         self.activePanel = ActivePanel.Nothing
         # logic
         self.wasMaximized = False
@@ -114,6 +112,7 @@ class MainWindow(QMainWindow):
         self.status_bar = StatusBar(self, Component.StatusBar)
 
     def build_ui(self):
+        self.create_context()
         self.create_main_components()
         self.create_notepad_components()
         self.create_side_components()
@@ -137,6 +136,9 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(desktop)
         self.layout.addWidget(self.status_bar)
 
+        self.window.setLayout(self.layout)
+        self.setCentralWidget(self.window)
+
     # shortcuts actions
     def bind_shortcuts(self):
         self.shortcutSave.activated.connect(self.action_save)
@@ -154,8 +156,8 @@ class MainWindow(QMainWindow):
         self.shortcutMode.activated.connect(self.action_switch_editor_mode)
         
     def action_save(self):
-        saved = self.notepad.save(self.context.active_folder)
-        saved = self.sidenote.save(self.context.active_folder)
+        saved = self.notepad.save(self.context.source_folder)
+        saved = self.sidenote.save(self.context.source_folder)
         
         if saved:
             self.status_bar.publish("Saved!")
@@ -202,10 +204,10 @@ class MainWindow(QMainWindow):
             self.settingsWindow.show()
 
     def action_switch_editor_theme(self):
-        if self.editorTheme == EditorTheme.Dark:
-            self.editorTheme = EditorTheme.Light
+        if self.context.color_theme == EditorTheme.Dark:
+            self.context.color_theme = EditorTheme.Light
         else:
-            self.editorTheme = EditorTheme.Dark
+            self.context.color_theme = EditorTheme.Dark
         self.set_editor_theme()
 
     def action_switch_editor_mode(self):
@@ -215,12 +217,92 @@ class MainWindow(QMainWindow):
             self.editorMode = EditorMode.Focus
         self.set_editor_mode()
 
+    # dialogs
+    def build_dialogs(self):
+        self.build_settings_dialog()
+        self.build_info_dialog()
+        self.build_folder_switch_dialog()
 
+    def build_settings_dialog(self):
+        self.settingsWindow = QWidget(self)
+        settings = SettingsView(self.settingsWindow)
+        self.resizeEvent(None)
 
+    def build_info_dialog(self):
+        self.infoWindow = QWidget(self)
+        info = InfoWindow(self.infoWindow)
+        self.resizeEvent(None)
 
+    def build_folder_switch_dialog(self):
+        self.folderSwitch = QWidget(self)
+        switch = FolderSwitch(self.folderSwitch)
+        self.resizeEvent(None)
 
+    # main window settings
+    def window_setup(self):
+        self.setMinimumSize(800, 600)
+        self.setWindowTitle(self.version.app_name())
 
+        self.set_editor_theme()
+        self.set_icon()
+        self.set_geometry()
 
+    def set_editor_theme(self):
+        self.setStyleSheet(self.stylist.get_style_sheet(self.context.color_theme))
+
+    def set_icon(self):
+        self.setWindowIcon(QtGui.QIcon(self.directory.get_resource_dir() + 'icon.png'))
+
+    def set_geometry(self):
+        if self.context.window_left < 0 or self.context.window_top < 0:
+            
+            screen = QDesktopWidget().screenGeometry(-1)
+            self.context.window_width = int(screen.width() / 3) * 2
+            self.context.window_height = int(screen.height() / 3) * 2
+            if self.context.window_width < 800:
+                self.context.window_width = 800
+            if self.context.window_height < 600:
+                self.context.window_height = 600
+            self.setGeometry(
+                0, 0, 
+                self.context.window_width,
+                self.context.window_height
+            )
+            self.center_window()
+        else:
+            if self.context.window_width < 800:
+                self.context.window_width = 800
+            if self.context.window_height < 600:
+                self.context.window_height = 600
+            self.setGeometry(
+                self.context.window_left, 
+                self.context.window_top,
+                self.context.window_width,
+                self.context.window_height
+            )
+            self.move(
+                self.context.window_left,
+                self.context.window_top
+            )
+
+    def center_window(self):
+        geometry = self.frameGeometry()
+        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        geometry.moveCenter(centerPoint)
+        self.move(geometry.topLeft())
+
+    def show_window(self):
+        if self.context.window_maximized == 1:
+            self.showMaximized()
+        else:
+            self.showNormal()
+
+    #
+    def load_folder(self):
+        if self.context.is_source_local:
+            self.notepad.load(self.context.source_folder)
+            self.sidenote.load(self.context.source_folder)
 
 
 
@@ -228,28 +310,7 @@ class MainWindow(QMainWindow):
 
     ## dragons below
 
-    # editor themes {
-    def read_theme_from_settings(self):
-        theme = Database().get_value("theme", "L")
-        if theme == "D":
-            self.editorTheme = EditorTheme.Dark
-        else :
-            self.editorTheme = EditorTheme.Light
-
-
-
-    def set_editor_theme(self): # todo
-        #self.sideTabs.setStyleSheet("""QTabWidget::pane {
-        #    border: 0px solid lightgray;
-        ##    top:-1px; 
-        #    background: rgb(245, 245, 245);
-        #    } """)
-        self.setStyleSheet(self.stylist.get_style_sheet(self.editorTheme))
-    # }
-
-    # editor modes {
-
-    
+   
     def set_editor_mode(self):
         if self.editorMode == EditorMode.Focus:
             self.set_focus_mode_margins()
@@ -309,40 +370,14 @@ class MainWindow(QMainWindow):
             self.resize_folder_switch()
     # }
 
-
-    
-    
-    # book {
-    def prepare_book(self):
-        self.stack_book_elements()
-        self.load_context()
-        self.load_notes_contents()
-
-    
-    def stack_book_elements(self):
-        text_size = int(Database().get_value("text_size", "13"))
-
-    
-    def load_context(self):
-        source = Database().get_value("folder_source", "LOCAL")
-        self.context.source_local = source == "LOCAL"
-        self.context.active_folder = int(Database().get_value("folder_opened", "1"))
-
-    def load_notes_contents(self):
-        if self.context.source_local:
-            self.notepad.load(self.context.active_folder)
-            self.sidenote.load(self.context.active_folder)
-    # }
-
-
-    def load_folder(self, folder):
-        if folder != self.context.active_folder:
-            self.action_save()
-            db = Database()
-            db.store_value("folder_opened", folder)
-            db.store_value("folder_source", "LOCAL")
-            self.context.active_folder = folder
-            self.load_notes_contents()
+    #def load_folder(self, folder):
+    #    if folder != self.context.source_folder:
+    #        self.action_save()
+    #        db = Database()
+    #        db.store_value("folder_opened", folder)
+    #        db.store_value("folder_source", "LOCAL")
+    #        self.context.source_folder = folder
+    #        self.load_notes_contents()
 
     # status {
 
@@ -358,10 +393,7 @@ class MainWindow(QMainWindow):
     # }
 
     # info dialog {
-    def build_info_panel(self):
-        self.infoWindow = QWidget(self)
-        info = InfoWindow(self.infoWindow)
-        self.resizeEvent(None)
+
 
     def resize_info_panel(self):
         max_width_ip = 700
@@ -374,10 +406,7 @@ class MainWindow(QMainWindow):
     # }
 
     # settings dialog {
-    def build_settings_dialog(self):
-        self.settingsWindow = QWidget(self)
-        settings = SettingsView(self.settingsWindow)
-        self.resizeEvent(None)
+
 
     def resize_settings_panel(self):
         max_width_ip = 700
@@ -392,10 +421,6 @@ class MainWindow(QMainWindow):
 
 
     # switch folder {
-    def build_folder_switch(self):
-        self.folderSwitch = QWidget(self)
-        switch = FolderSwitch(self.folderSwitch)
-        self.resizeEvent(None)
 
     def resize_folder_switch(self):
         maxw = 700
@@ -408,59 +433,14 @@ class MainWindow(QMainWindow):
     # }
 
 
+      
+        
+        
 
-    # app {
-    def stack_gui_elements(self):
-        self.stack_book_elements()
 
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)
-        self.window.setLayout(self.layout)
     
-    def setup_app(self):
-        self.read_theme_from_settings()
-        self.set_editor_theme()
-        self.setup_icon()
-        self.bind_shortcuts()
-        self.setWindowTitle(self.version.app_name())
-        self.setup_window_geometry()
-        if int(Database().get_value("window_max", "0")) == 1:
-            self.showMaximized()
-        else:
-            self.showNormal()
-
-    def setup_window_geometry(self):
-        x = int(Database().get_value("window_left", "-1"))
-        y = int(Database().get_value("window_top", "-1"))
-        w = int(Database().get_value("window_width", "-1"))
-        h = int(Database().get_value("window_height", "-1"))
-
-        #print(x)
-        #print(y)
-        #print(w)
-        #print(h)
-
-        if x < 0 or y < 0:
-            screen = QDesktopWidget().screenGeometry(-1)
-            w = (screen.width() / 3) *2
-            h = (screen.height() / 3) *2
-            if w < 800: 
-                w = 800
-            if h < 600:
-                h = 600
-            self.setGeometry(0, 0, int(w), int(h))
-            self.center()
-        else:
-            if w < 800: 
-                w = 800
-            if h < 600:
-                h = 600
-            self.setGeometry(x, y, int(w), int(h))
-            self.move(x, y)
 
 
-    def setup_icon(self):
-        self.setWindowIcon(QtGui.QIcon(self.directory.get_resource_dir() + 'icon.png'))
 
 
 
@@ -477,23 +457,12 @@ class MainWindow(QMainWindow):
         theme = "D" if self.editorTheme == EditorTheme.Dark else "L"
         Database().store_value("theme", theme)
 
-    def center(self):
-        geometry = self.frameGeometry()
-        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
-        centerPoint = QApplication.desktop().screenGeometry(screen).center()
-        geometry.moveCenter(centerPoint)
-        self.move(geometry.topLeft())
+
 
     def init_ui(self):
-        self.setMinimumSize(800, 600)
-        self.prepare_book()
-        self.stack_gui_elements()
-        self.setup_app()
         self.prepare_timers()
-        self.setCentralWidget(self.window)
-        self.build_info_panel()
-        self.build_settings_dialog()
-        self.build_folder_switch()
+        
+
     # }
 
 def main():

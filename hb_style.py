@@ -1,5 +1,12 @@
 from hb_enums import (EditorTheme)
 
+"""
+QTabWidget::pane {
+            border: 0px solid lightgray;
+            top:-1px; 
+            background: rgb(245, 245, 245);
+            } )
+        """
 class Stylist():
 
     def get_style_sheet(self, theme):
