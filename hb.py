@@ -302,6 +302,19 @@ class MainWindow(QMainWindow):
     def clear_status(self):
         self.status_bar.clear()
 
+    # events
+    def resizeEvent(self, event):
+        if self.editorMode == EditorMode.Focus:
+            self.set_focus_mode_margins()
+        if not (self.infoWindow is None):
+            self.resize_info_panel()
+        if not (self.settingsWindow is None):
+            self.resize_settings_panel()
+        if not (self.folderSwitch is None):
+            self.resize_folder_switch()
+
+
+
 
 
 
@@ -339,15 +352,7 @@ class MainWindow(QMainWindow):
         self.action_save()
         event.accept()
 
-    def resizeEvent(self, event):
-        if self.editorMode == EditorMode.Focus:
-            self.set_focus_mode_margins()
-        if not (self.infoWindow is None):
-            self.resize_info_panel()
-        if not (self.settingsWindow is None):
-            self.resize_settings_panel()
-        if not (self.folderSwitch is None):
-            self.resize_folder_switch()
+
     # }
 
     #def load_folder(self, folder):

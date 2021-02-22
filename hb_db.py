@@ -11,7 +11,7 @@ class Database():
     def __init__(self):
         self.name = Directory().get_notes_dir() + "notebooks.db"
 
-    def create(self):
+    def create(self): # todo
         db = QSqlDatabase.addDatabase("QSQLITE")
         db.setDatabaseName(self.name)
 
@@ -26,40 +26,74 @@ class Database():
             sqlQuery.exec_(query)
 
         self.update()
+    
+    def get_text(self, folder, sleeve):
+        print(folder)
+        print(sleeve)
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
 
-    def save_notebook(self, content, side, folder_id):
-        main_indicator = -1
-        if side:
-            self.archive_side_notebook(folder_id)
-            main_indicator = 0
-        else:
-            self.archive_main_notebook(folder_id)
-            main_indicator = 1
+        if not db.open():
+            print("NOT OPEN :GET M")
+            return False
+
+        query = QSqlQuery()
+        query.prepare("SELECT content FROM notebook WHERE sleeve = :sleeve AND archived = 0 AND folder = :folder")
+        query.bindValue(":folder", int(folder))
+        query.bindValue(":sleeve", int(sleeve))
+        query.exec_()
+        while query.next():
+            return query.value(0)
+        return ""
+
+
+#dragons 
+
+    def save_text(self, folder, sleeve, content):
+
+        return False
+        
+        sleeve_id = int(sleeve)
+
+        query_text = """
+        INSERT INTO notebook (
+            id, 
+            folder, 
+            content, 
+            version, 
+            save_time, 
+            sleeve, 
+            archived
+        ) values (
+            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
+            :folder,
+            :content,
+            (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE sleeve = :sleeve AND folder = :folder),
+            datetime('now','localtime'),
+            :sleeve, 
+            0
+        );"""
+
+        #archive sleeve
 
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
         if not db.open():
-            print("NOT OPEN :SAVE")
+            print("NOT OPEN :SAVE NOTEBOOK")
             return False
 
         query = QSqlQuery()
-        query.prepare(
-        """INSERT INTO notebook (id, folder, content, version, save_time, main_page, archived) values (
-            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
-            :folder,
-            :content,
-            (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE main_page = :mpage AND folder = :folder),
-            datetime('now','localtime'),
-            :mpage, 0
-        );""")
+        query.prepare(query_text)
 
-        query.bindValue(":folder", folder_id)   
+        query.bindValue(":folder", folder)   
         query.bindValue(":content", content)
-        query.bindValue(":mpage", main_indicator)
+        query.bindValue(":sleeve", sleeve)
         query.exec_()
 
-        self.remove_old_versions(main_indicator, folder_id)
+        # self.remove_old_versions(sleeve, folder_id)
+
+    
 
     def remove_old_versions(self, side, folder_id):
         db = QSqlDatabase.database()
@@ -101,38 +135,6 @@ class Database():
         query.bindValue(":folder", folder_id)
         query.exec_()
         
-
-    def get_main_content(self, folder_id):
-        db = QSqlDatabase.database()
-        db.setDatabaseName(self.name)
-
-        if not db.open():
-            print("NOT OPEN :GET M")
-            return False
-
-        query = QSqlQuery()
-        query.prepare("SELECT content FROM notebook WHERE main_page = 1 AND archived = 0 AND folder = :folder")
-        query.bindValue(":folder", folder_id)
-        query.exec_()
-        while query.next():
-            return query.value(0)
-        return ""
-        
-    def get_side_content(self, folder_id):
-        db = QSqlDatabase.database()
-        db.setDatabaseName(self.name)
-
-        if not db.open():
-            print("NOT OPEN :GET S")
-            return False
-
-        query = QSqlQuery()
-        query.prepare("SELECT content FROM notebook WHERE main_page = 0 AND archived = 0 AND folder = :folder")
-        query.bindValue(":folder", folder_id)
-        query.exec_()
-        while query.next():
-            return query.value(0)
-        return ""
 
     def get_database_version(self):
         db = QSqlDatabase.database()
@@ -279,49 +281,4 @@ class Database():
 
 
 
-    def save_text(self, folder, sleeve, content):
-        
-        sleeve_id = int(sleeve)
-
-        query_text = """
-        INSERT INTO notebook (
-            id, 
-            folder, 
-            content, 
-            version, 
-            save_time, 
-            sleeve, 
-            archived
-        ) values (
-            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
-            :folder,
-            :content,
-            (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE sleeve = :sleeve AND folder = :folder),
-            datetime('now','localtime'),
-            :sleeve, 
-            0
-        );"""
-
-        #archive sleeve
-
-        db = QSqlDatabase.database()
-        db.setDatabaseName(self.name)
-
-        if not db.open():
-            print("NOT OPEN :SAVE NOTEBOOK")
-            return False
-
-        query = QSqlQuery()
-        query.prepare(query_text)
-
-        query.bindValue(":folder", folder_id)   
-        query.bindValue(":content", content)
-        query.bindValue(":sleeve", sleeve)
-        query.exec_()
-
-        # self.remove_old_versions(sleeve, folder_id)
-
-    def get_text(self, folder_id, sleeve):
-        db = QSqlDatabase.database()
-        db.setDatabaseName(self.name)
-        return ""
+    

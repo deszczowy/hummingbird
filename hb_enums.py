@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import (Enum, IntEnum)
 
 class ActivePanel(Enum):
     Nothing = 0
@@ -13,7 +13,7 @@ class EditorTheme(Enum):
     Light = 0
     Dark = 1
 
-class Component(Enum):
+class Component(IntEnum):
     Notepad = 0
     SideNotes = 1
     ToDoList = 2
