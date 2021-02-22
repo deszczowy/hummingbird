@@ -302,6 +302,18 @@ class MainWindow(QMainWindow):
     def clear_status(self):
         self.status_bar.clear()
 
+    def save_window_params(self):
+        if self.isMaximized():
+            self.context.window_maximized = True
+        else:
+            self.context.window_maximized = False
+            geometry = self.geometry()
+            pos = self.pos()
+            self.context.window_left = pos.x()
+            self.context.window_top = pos.y()
+            self.context.window_width = geometry.width()
+            self.context.window_height = geometry.height()
+
     # events
     def resizeEvent(self, event):
         if self.editorMode == EditorMode.Focus:
@@ -313,7 +325,11 @@ class MainWindow(QMainWindow):
         if not (self.folderSwitch is None):
             self.resize_folder_switch()
 
-
+    def closeEvent(self, event):
+        self.save_window_params()
+        self.context.store()
+        self.action_save()
+        event.accept()
 
 
 
@@ -347,15 +363,12 @@ class MainWindow(QMainWindow):
 
 
     # events {
-    def closeEvent(self, event):
-        self.save_window_position()
-        self.action_save()
-        event.accept()
+    
 
 
     # }
 
-    #def load_folder(self, folder):
+    #def load_folder(self, folder): # should be switch folder method
     #    if folder != self.context.source_folder:
     #        self.action_save()
     #        db = Database()
@@ -429,18 +442,7 @@ class MainWindow(QMainWindow):
 
 
 
-    def save_window_position(self):
-        if not self.isMaximized():
-            geometry = self.geometry()
-            pos = self.pos()
-            Database().store_value("window_left", pos.x())
-            Database().store_value("window_top", pos.y())
-            Database().store_value("window_width", geometry.width())
-            Database().store_value("window_height", geometry.height())
-        maximized = "1" if self.isMaximized() else "0"
-        Database().store_value("window_max", maximized)
-        theme = "D" if self.editorTheme == EditorTheme.Dark else "L"
-        Database().store_value("theme", theme)
+
 
 
 

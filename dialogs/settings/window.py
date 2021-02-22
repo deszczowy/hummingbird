@@ -52,6 +52,7 @@ class SettingsView(QWidget):
         page_layout.addLayout(column_right)
 
         # controls
+        # todo: read from context
 
         self.font_size_label = QLabel()
         self.font_size_label.setText("Font size")
@@ -88,7 +89,7 @@ class SettingsView(QWidget):
         else:
             pt = int(size)
 
-        Database().store_value("text_size", pt)
+        Database().store_value("text_size", pt) # todo: remove. context only. save on quit or on schedule
         self.main.parent().update_font_size()
     
     def close(self):
