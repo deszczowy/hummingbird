@@ -33,6 +33,7 @@ from dialogs.switch.window import FolderSwitch
 from classes.context import *
 from classes.timer import *
 from components.side import *
+from components.todolist import *
 from components.statusbar import *
 
 class MainWindow(QMainWindow):
@@ -103,6 +104,9 @@ class MainWindow(QMainWindow):
     def create_notepad_components(self):
         self.notepad = Notepad(self)
 
+    def create_todolist_components(self):
+        self.todolist = ToDoList(self, Component.ToDoList)
+
     def create_status_bar(self):
         self.status_bar = StatusBar(self, Component.StatusBar)
 
@@ -111,13 +115,15 @@ class MainWindow(QMainWindow):
         self.create_main_components()
         self.create_notepad_components()
         self.create_side_components()
+        self.create_todolist_components()
         self.create_status_bar()
 
         desktop = QWidget()
         desktop_container = QHBoxLayout()
 
         side_tabs = QTabWidget()
-        side_tabs.addTab(self.sidenote, "Side notes")
+        side_tabs.addTab(self.sidenote, "Side Notes")
+        side_tabs.addTab(self.todolist, "To Do List")
         side_tabs.setFixedWidth(300)
 
         desktop_container.addWidget(self.notepad) # separate class
