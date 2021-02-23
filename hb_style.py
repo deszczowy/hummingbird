@@ -1,12 +1,5 @@
 from hb_enums import (EditorTheme)
 
-"""
-QTabWidget::pane {
-            border: 0px solid lightgray;
-            top:-1px; 
-            background: rgb(245, 245, 245);
-            } )
-        """
 class Stylist():
 
     def get_style_sheet(self, theme):
@@ -15,18 +8,75 @@ class Stylist():
         else:
             return self.get_style_sheet_light()
 
+# info_window_widget.setStyleSheet("QWidget{background-color: #efefef;}")
+# self.main.setStyleSheet("QWidget{background-color: #f5f5f5;}")
+# self.main.setStyleSheet("QWidget{background-color: #f5f5f5;}")
+#         header.setStyleSheet("font-size: 20px;")
+
     def get_style_sheet_dark(self):
         return """
-            QWidget {
+
+            /* Base components setup */
+
+            QWidget
+            {
                 margin:0px; 
                 padding:0px; 
                 border:0px;
-                background-color: black;
-            } 
-
-            QLineEdit {
-                border: 1px dotted #353535;
+                background-color: #050505;
             }
+
+            QLineEdit
+            {
+                border: 0px;
+                border-bottom: 1px solid #353535;
+                color: silver;
+            }
+
+            QTextEdit
+            {
+                padding: 0px;
+                color: silver;
+            }
+
+            QPushButton
+            {
+                font-size:12px;
+                border: 0px; 
+                min-width: 70px; 
+                min-height: 30px; 
+                padding: 5px; 
+                background-color: #353535; 
+                color: black;
+            }
+
+            /* Tabs */
+
+            QTabWidget::pane
+            {
+                border: 0px solid lightgray;
+                top:-1px; 
+                background: rgb(245, 245, 245);
+            }
+
+            /* List */
+
+            QListView
+            {
+                background-color: #000;
+                margin:0px; 
+                padding:0px;
+                border:0px;
+                selection-color :blue;
+                selection-background-color: yellow;
+            } 
+            
+            QListView::item
+            {
+                padding: 7px;
+            }
+
+            /* Scrollbar */
 
             QScrollBar:vertical
             {
@@ -62,17 +112,8 @@ class Stylist():
                 background: none;
             }
 
-            QPushButton
-            {
-                font-size:12px;
-                border: 1px solid silver; 
-                min-width: 70px; 
-                min-height: 30px; 
-                padding: 5px; 
-                background-color: #000; 
-                color: silver;
-            }
         """
+
     def get_style_sheet_light(self):
         return """
             QWidget {
@@ -141,51 +182,3 @@ class Stylist():
                 color: black;
             }
         """
-
-
-
-    def get_side_notes_style_sheet(self, theme):
-        if theme == EditorTheme.Dark:
-            return self.get_side_notes_style_sheet_dark()
-        else:
-            return self.get_side_notes_style_sheet_light()
-
-    def get_side_notes_style_sheet_dark(self):
-        return """
-            border-left: 1px dashed #353535;
-        """
-    def get_side_notes_style_sheet_light(self):
-        return """
-            
-        """
-    def get_side_notes_style_focus(self, theme):
-        if theme == EditorTheme.Dark:
-            return "border:0px; color: #252525;"
-        else:
-            return "border:0px; color: silver;"
-
-
-
-    def get_status_board_style_sheet(self, theme):
-        if theme == EditorTheme.Dark:
-            return self.get_status_board_style_sheet_dark()
-        else:
-            return self.get_status_board_style_sheet_light()
-
-    def get_status_board_style_sheet_dark(self):
-        return """
-            .QFrame {
-                border-top: 1px dashed #353535; 
-            }
-        """
-    def get_status_board_style_sheet_light(self):
-        return """
-            .QFrame {
-                border-top: 1px dashed black; 
-            }
-        """
-    def get_status_board_style_focus(self, theme):
-        if theme == EditorTheme.Dark:
-            return ".QFrame {border:0px;} QPushButton {color: #252525;}"
-        else:
-            return ".QFrame {border:0px;} QPushButton {color: silver;}"

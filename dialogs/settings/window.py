@@ -17,8 +17,6 @@ class SettingsView(QWidget):
 
         self.main = settings_window_widget
 
-        self.main.setStyleSheet("QWidget{background-color: #f5f5f5;}")
-
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(20, 20, 20, 20)
 

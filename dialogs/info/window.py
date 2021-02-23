@@ -12,7 +12,6 @@ from dialogs.info.content import *
 class InfoWindow:
 
     def __init__(self, info_window_widget):
-        info_window_widget.setStyleSheet("QWidget{background-color: #efefef;}")
         infoLayout = QVBoxLayout()
         infoLayout.setContentsMargins(20, 20, 20, 20)
         

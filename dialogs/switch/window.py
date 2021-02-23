@@ -21,7 +21,6 @@ class FolderSwitch(QWidget):
 
         self.main = main_widget
 
-        self.main.setStyleSheet("QWidget{background-color: #f5f5f5;}")
         switchLayout = QVBoxLayout()
         switchLayout.setContentsMargins(20, 20, 20, 20)
         
@@ -34,15 +33,10 @@ class FolderSwitch(QWidget):
 
         header = QLabel()
         header.setText("Select notebook:")
-        header.setStyleSheet("font-size: 20px;")
 
         self.folders = QListView()
         self.folders.setModel(Database().get_folder_model())
         self.folders.clicked[QModelIndex].connect(self.select_folder)
-        self.folders.setStyleSheet("""
-            QListView{background-color: #fff;} 
-            QListView::item{padding: 7px;}
-        """)
 
         buttons = QWidget()
         buttons_layout = QHBoxLayout()
