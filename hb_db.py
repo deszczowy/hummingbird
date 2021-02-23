@@ -237,10 +237,12 @@ class Database():
         
         query = QSqlQuery()
         query.exec_("SELECT id, label FROM folder")
-
-        model = BasicItemModel()
+        
+        model = QStandardItemModel()
         while query.next():
-            item = QStandardItem(query.value(1))
+            item = FolderItem(query.value(1))
+            item.setSelectable(True)
+            item.setEditable(False)
             item.folder_id = query.value(0)
             model.appendRow(item)
 
