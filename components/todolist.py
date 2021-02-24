@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
 
 from hb_enums import Component
 from classes.items.folder import ToDoItem
+from hb_db import Database
 
 class ToDoList(QWidget):
     def __init__(self, parent, component_def):
@@ -25,13 +26,7 @@ class ToDoList(QWidget):
         self.prepare()
 
     def prepare(self):
-        item1 = ToDoItem("Entry 1")
-        item1.setCheckable(True)
-        item2 = ToDoItem("Entry 2")
-        item2.setCheckable(True)
-        model = QStandardItemModel()
-        model.appendRow(item1)
-        model.appendRow(item2)
+        model = Database().get_task_model(1)
         self.list.setModel(model)
         self.list.clicked[QModelIndex].connect(self.item_check)
 

@@ -248,6 +248,32 @@ class Database():
 
         return model
 
+    def get_task_model(self, folder):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :GET TASK")
+            return False
+
+        query = QSqlQuery()
+        query.prepare("SELECT id, label, priority, stamp FROM task WHERE folder = :folder AND done = 0 ORDER BY priority DESC, stamp DESC")
+        query.bindValue(":folder", folder)
+        query.exec()
+
+        model = QStandardItemModel()
+        while query.next():
+            item = ToDoItem(query.value(1))
+            item.setSelectable(True)
+            item.setEditable(False)
+            item.setCheckable(True)
+            item.id = int(query.value(0))
+            item.priority = Priority(int(query.value(2)))
+            item.date = datetime.datetime.strptime(query.value(3),"%Y%m%d%H%M%S")
+            model.appendRow(item)
+        
+        return model
+
     def insert_folder(self, folder_name):
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
