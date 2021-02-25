@@ -305,8 +305,29 @@ class Database():
         query.bindValue(":folder", folder_id)
         query.exec_()
 
-    
+    def insert_task(self, folder, item):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
 
+        if not db.open():
+            print("NOT OPEN :I TASK")
+            return False
 
-
-    
+        query = QSqlQuery()
+        query.prepare("""
+            INSERT INTO task (
+                id, folder, label, priority, stamp, done
+            ) VALUES (
+                (SELECT IFNULL(MAX(id),0) +1 FROM task),
+                :folder,
+                :label,
+                :priority,
+                :stamp,
+                0
+            )
+        """)
+        query,bindValue(":folder", folder)
+        query.bindValue(":label", item.text())
+        query.bindValue(":date", item.date)
+        query.bindValue(":priority", int(item.priority))
+        query.exec_()

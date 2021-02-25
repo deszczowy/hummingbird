@@ -5,11 +5,12 @@ from PyQt5.QtGui import (QStandardItemModel, QStandardItem)
 from PyQt5.QtCore import QModelIndex
 
 from PyQt5.QtWidgets import (
-    QVBoxLayout, QWidget, QListView
+    QVBoxLayout, QHBoxLayout, 
+    QWidget, QListView, QLineEdit, QComboBox, QPushButton
 )
 
 from hb_enums import Component
-from classes.items.folder import ToDoItem
+from classes.items.folder import *
 from hb_db import Database
 
 class ToDoList(QWidget):
@@ -18,20 +19,59 @@ class ToDoList(QWidget):
         self.component = component_def
         self.layout = QVBoxLayout()
         self.list = QListView()
+
+        self.ids = []
+
+        self.form = QVBoxLayout()
+        self.buttons = QHBoxLayout()
+
+        self.label = QLineEdit()
+        self.priority = QComboBox()
+        self.priority.insertItem(0, "Low")
+        self.priority.insertItem(1, "Medium")
+        self.priority.insertItem(2, "High")
+        self.priority.insertItem(3, "Critical")
+        
+        self.add = QPushButton("Add")
+        self.add.clicked.connect(self.action_add)
+
         self.stack()
 
     def stack(self):
         self.layout.addWidget(self.list)
+        self.form.addWidget(self.label)
+        self.buttons.addWidget(self.priority)
+        self.buttons.addWidget(self.add)
+        self.form.addLayout(self.buttons)
+        self.layout.addLayout(self.form)
         self.setLayout(self.layout)
         self.prepare()
 
     def prepare(self):
         model = Database().get_task_model(1)
         self.list.setModel(model)
-        self.list.clicked[QModelIndex].connect(self.item_check)
+        #self.list.clicked[QModelIndex].connect(self.item_check)
 
-    def item_check(self, index):
-        item = self.list.model().itemFromIndex(index)
-        if item.checkState() == QtCore.Qt.Checked:
-            print(item.date)
-            print(item.priority)
+    #def item_check(self, index):
+    #    item = self.list.model().itemFromIndex(index)
+    #    if item.checkState() == QtCore.Qt.Checked:
+
+    def action_add(self):
+        item = ToDoItem(self.label.text())
+        item.date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        item.priority = Priority(self.priority.currentIndex())
+        item.setSelectable(True)
+        item.setEditable(False)
+        item.setCheckable(True)
+        self.list.model().appendRow(item)        
+
+    def do_count(self):
+        self.ids.clear()
+
+        model = self.list.model()
+        for index in range(model.rowCount()):
+            item = model.item(index)
+            if item.checkState() == QtCore.Qt.Checked:
+                self.ids.append(item.id)
+        
+        print(self.ids)
