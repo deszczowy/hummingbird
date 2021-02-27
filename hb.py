@@ -157,7 +157,6 @@ class MainWindow(QMainWindow):
         self.shortcutMode.activated.connect(self.action_switch_editor_mode)
         
     def action_save(self):
-        print("save")
         saved = False
         saved = saved or self.notepad.save(self.context.source_folder)
         saved = saved or self.sidenote.save(self.context.source_folder)

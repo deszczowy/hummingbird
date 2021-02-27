@@ -31,7 +31,6 @@ class Editor(QWidget):
     def save(self, folder):
 
         if self.editor.document().isModified():
-            print(self.component)
             Notes().save_text(
                 folder,
                 self.component, 

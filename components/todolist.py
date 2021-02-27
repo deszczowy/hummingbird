@@ -64,6 +64,7 @@ class ToDoList(QWidget):
         item.setCheckable(True)
         idx = self.get_index_of_priority_to_insert(item.priority)
         self.list.model().insertRow(idx, item)
+        self.label.setText("")
 
     def get_index_of_priority_to_insert(self, priority):
         p = int(priority)
@@ -74,13 +75,30 @@ class ToDoList(QWidget):
         return 0
 
     def save(self, folder):
-        print(self.component)
         model = self.list.model()
+        result = False
 
         for index in range(model.rowCount()):
             item = model.item(index)
             if item.id == 0:
-                Database().insert_task(folder, item)
+                item.id = Database().insert_task(folder, item)
+                result = True
             else:
                 if item.checkState() == QtCore.Qt.Checked:
-                    Database().check_task(item.id)
+                    Database().check_task(item.id) 
+                    result = True
+
+        self.tidy_up()
+
+        return result
+
+    def tidy_up(self):
+        go_on = self.list.model().rowCount() > 0
+        i = 0
+
+        while go_on:
+            if self.list.model().item(i).checkState() == QtCore.Qt.Checked:
+                self.list.model().removeRow(i)
+            else:
+                i += 1
+            go_on = i < self.list.model().rowCount()

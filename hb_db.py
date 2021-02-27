@@ -1,4 +1,5 @@
 from PyQt5.QtSql import (QSqlDatabase, QSqlQuery)
+from PyQt5 import QtCore
 
 from hb_dir import Directory
 from hb_sql import Sql
@@ -295,6 +296,9 @@ class Database():
         query.exec_()
 
     def insert_task(self, folder, item):
+
+        done = 1 if item.checkState() == QtCore.Qt.Checked else 0
+
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
@@ -312,18 +316,19 @@ class Database():
                 :label,
                 :priority,
                 :stamp,
-                0
+                :done
             );
         """)
-        query,bindValue(":folder", folder)
+        query.bindValue(":folder", folder)
         query.bindValue(":label", item.label)
-        query.bindValue(":date", item.date)
+        query.bindValue(":stamp", item.date)
         query.bindValue(":priority", int(item.priority))
+        query.bindValue(":done", done)
         query.exec_()
 
-        query.exec_("SELECT IFNULL(MAX(id),1) FROM task")
-        while query.next():
-            return int(query.value(0))
+        ask = QSqlQuery("SELECT IFNULL(MAX(id),1) FROM task")
+        while ask.next():
+            return int(ask.value(0))
 
     def check_task(self, id):
         db = QSqlDatabase.database()
