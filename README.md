@@ -2,7 +2,7 @@
 
 # Hummingbird Editor
 
-This is a little notebook, with two visible editors. First one for main long notes. Second one for easy accessible additional side notes.
+This is a little notebook, with two visible editors. First one for main long notes. Second one for easy accessible additional side notes. Notebook also contains a simple task list.
 
 Current version is `0.8`
 
@@ -17,6 +17,7 @@ You can run Hummingbird by downloading this repository and go with `python3 hb.p
 In this version there are two main features:
 
 - Two visible editors
+- Task list
 - Autosave
 - Dark theme
 - Focus mode
@@ -61,3 +62,6 @@ The beautiful Hummingbird logo is made by [Freepik](https://www.flaticon.com/aut
 - Full screen mode
 - Now you can create and switch between multiple notebooks
 - App information now has special separate window
+
+#### Ver. 0.8
+- Notebook now has a task list

@@ -3,7 +3,7 @@
 ## Version 0.8
 
 - mode and theme switches in settings panel
-- todo list next to sidenotes, stored in database
++ todo list next to sidenotes, stored in database
 
 ## Version 0.9
 
@@ -27,6 +27,7 @@
 - using of text-to-speech plugin (?) for adding notes from recordings
 - snapshots of editing history
 - maybe switching to qtquick
+- notebook name visible on title bar
 
 ## Principles
 
