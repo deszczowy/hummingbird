@@ -19,10 +19,15 @@ class Timer:
         self.schedule.start(self.scheduler_interval)
 
     def timer_tic(self):
+        print("main timer")
         if self.tic > 0:
             self.tic -= 1
         if self.tic == 1:
             self.parent.clear_status()
 
     def schedule_tic(self):
+        print("schedule")
         self.parent.action_save()
+
+    def setup(self):
+        self.tic = 5

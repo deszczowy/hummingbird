@@ -19,7 +19,6 @@ class ToDoList(QWidget):
         self.component = component_def
         self.layout = QVBoxLayout()
         self.list = QListView()
-        self.ids = []
 
         self.form = QVBoxLayout()
         self.buttons = QHBoxLayout()
@@ -45,10 +44,9 @@ class ToDoList(QWidget):
         self.form.addLayout(self.buttons)
         self.layout.addLayout(self.form)
         self.setLayout(self.layout)
-        self.prepare()
 
-    def prepare(self):
-        model = Database().get_task_model(1)
+    def load(self, folder):
+        model = Database().get_task_model(folder)
         self.list.setModel(model)
         #self.list.clicked[QModelIndex].connect(self.item_check)
 
@@ -75,13 +73,14 @@ class ToDoList(QWidget):
                 return idx
         return 0
 
-    def do_count(self):
-        self.ids.clear()
-
+    def save(self, folder):
+        print(self.component)
         model = self.list.model()
+
         for index in range(model.rowCount()):
             item = model.item(index)
-            if item.checkState() == QtCore.Qt.Checked:
-                self.ids.append(item.id)
-        
-        print(self.ids)
+            if item.id == 0:
+                Database().insert_task(folder, item)
+            else:
+                if item.checkState() == QtCore.Qt.Checked:
+                    Database().check_task(item.id)

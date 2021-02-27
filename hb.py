@@ -157,12 +157,15 @@ class MainWindow(QMainWindow):
         self.shortcutMode.activated.connect(self.action_switch_editor_mode)
         
     def action_save(self):
-        saved = self.notepad.save(self.context.source_folder)
-        saved = self.sidenote.save(self.context.source_folder)
+        print("save")
+        saved = False
+        saved = saved or self.notepad.save(self.context.source_folder)
+        saved = saved or self.sidenote.save(self.context.source_folder)
+        saved = saved or self.todolist.save(self.context.source_folder)
         
         if saved:
             self.status_bar.publish("Saved!")
-            self.tic = 5
+            self.timer.setup()
     
     def action_toggle_fullscreen(self):
         if self.isFullScreen():
@@ -304,6 +307,7 @@ class MainWindow(QMainWindow):
         if self.context.is_source_local:
             self.notepad.load(self.context.source_folder)
             self.sidenote.load(self.context.source_folder)
+            self.todolist.load(self.context.source_folder)
 
     def clear_status(self):
         self.status_bar.clear()
