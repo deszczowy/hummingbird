@@ -28,8 +28,6 @@ class Database():
         self.update()
     
     def get_text(self, folder, sleeve):
-        print(folder)
-        print(sleeve)
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
@@ -263,11 +261,12 @@ class Database():
 
         model = QStandardItemModel()
         while query.next():
-            item = ToDoItem(query.value(1))
+            item = ToDoItem()
             item.setSelectable(True)
             item.setEditable(False)
             item.setCheckable(True)
             item.id = int(query.value(0))
+            item.label = query.value(1)
             item.priority = Priority(int(query.value(2)))
             item.date = datetime.datetime.strptime(query.value(3),"%Y%m%d%H%M%S")
             model.appendRow(item)

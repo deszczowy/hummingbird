@@ -19,13 +19,13 @@ class ToDoList(QWidget):
         self.component = component_def
         self.layout = QVBoxLayout()
         self.list = QListView()
-
         self.ids = []
 
         self.form = QVBoxLayout()
         self.buttons = QHBoxLayout()
 
         self.label = QLineEdit()
+        self.label.setPlaceholderText("new task name")
         self.priority = QComboBox()
         self.priority.insertItem(0, "Low")
         self.priority.insertItem(1, "Medium")
@@ -57,13 +57,23 @@ class ToDoList(QWidget):
     #    if item.checkState() == QtCore.Qt.Checked:
 
     def action_add(self):
-        item = ToDoItem(self.label.text())
+        item = ToDoItem()
+        item.label = self.label.text()
         item.date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         item.priority = Priority(self.priority.currentIndex())
         item.setSelectable(True)
         item.setEditable(False)
         item.setCheckable(True)
-        self.list.model().appendRow(item)        
+        idx = self.get_index_of_priority_to_insert(item.priority)
+        self.list.model().insertRow(idx, item)
+
+    def get_index_of_priority_to_insert(self, priority):
+        p = int(priority)
+        for idx in range(0, self.list.model().rowCount()):
+            item = self.list.model().item(idx)
+            if int(item.priority) <= p:
+                return idx
+        return 0
 
     def do_count(self):
         self.ids.clear()
