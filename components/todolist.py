@@ -19,6 +19,7 @@ class ToDoList(QWidget):
         self.component = component_def
         self.layout = QVBoxLayout()
         self.list = QListView()
+        self.list.setWordWrap(True)
 
         self.form = QVBoxLayout()
         self.buttons = QHBoxLayout()

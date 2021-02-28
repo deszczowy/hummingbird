@@ -122,8 +122,8 @@ class MainWindow(QMainWindow):
         desktop_container = QHBoxLayout()
 
         side_tabs = QTabWidget()
-        side_tabs.addTab(self.sidenote, "Side Notes")
-        side_tabs.addTab(self.todolist, "To Do List")
+        side_tabs.addTab(self.sidenote, "Notes")
+        side_tabs.addTab(self.todolist, "Tasks")
         side_tabs.setFixedWidth(300)
 
         desktop_container.addWidget(self.notepad) # separate class
@@ -131,6 +131,8 @@ class MainWindow(QMainWindow):
         desktop.setLayout(desktop_container)
         
         desktop.setContentsMargins(0, 0, 0, 0)
+        side_tabs.setContentsMargins(0, 0, 0, 0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
         desktop_container.setContentsMargins(0, 0, 0, 0)
         desktop_container.setSpacing(0)
 
