@@ -302,7 +302,10 @@ class MainWindow(QMainWindow):
             self.showNormal()
 
     #
-    def load_folder(self):
+    def load_folder(self, folder = 0):
+        if folder != 0:
+            self.context.source_folder = folder
+
         if self.context.is_source_local:
             self.notepad.load(self.context.source_folder)
             self.sidenote.load(self.context.source_folder)
