@@ -1,13 +1,3 @@
-#D4D4D4 active background
-#1A1A1A inactive background
-#8C8C8C visible background elements (bottom lines, scrollbars, etc.)
-#1E1E1E main text
-#4D4D4D clickable areas (buttons, items)
-
-#252526 dialog background
-
-#474747 separators, unused in palette
-
 stylesheet_light = """
 
     /* Base components setup */
