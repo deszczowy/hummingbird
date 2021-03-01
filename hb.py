@@ -25,7 +25,7 @@ from hb_enums import (ActivePanel, EditorMode, EditorTheme)
 from hb_dir import Directory
 
 from hb_db import Database
-from hb_style import Stylist
+from style.style import Stylist
 
 from dialogs.info.window import InfoWindow
 from dialogs.settings.window import SettingsView
