@@ -17,6 +17,9 @@ class StatusBar(QWidget):
         self.messages = QLabel()
         self.info = QLabel()
 
+        self.info.setObjectName("StatusBar")
+        self.messages.setObjectName("MessageBoard")
+
         self.build()
 
     def build(self):

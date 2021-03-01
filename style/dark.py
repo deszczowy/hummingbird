@@ -19,6 +19,7 @@ stylesheet_dark = """
         border:0px;
         background-color: #1E1E1E;
         color: #D4D4D4;
+        font-size: 14px;
     }
 
     QLineEdit
@@ -174,4 +175,19 @@ stylesheet_dark = """
         color: #D4D4D4;
     }
 
+    #StatusBar
+    {
+        font-size: 10px;
+        color: #8C8C8C;
+        padding: 5px;
+        font-family: mono;
+    }
+
+    #MessageBoard 
+    {
+        font-size: 10px;
+        color: #8C8C8C;
+        padding: 5px;
+        font-family: mono;
+    }
 """
