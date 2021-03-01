@@ -1,6 +1,8 @@
 from hb_db import *
 from hb_enums import *
 
+# todo: save on quit or on schedule
+
 class Context:
 
     color_theme = EditorTheme.Light

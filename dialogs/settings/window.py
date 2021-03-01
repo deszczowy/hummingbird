@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
 
 from hb_db import Database
 from hb_dir import Directory
+from hb_enums import *
 
 class SettingsView(QWidget):
 
@@ -16,6 +17,7 @@ class SettingsView(QWidget):
         super(SettingsView, self).__init__(settings_window_widget)
 
         self.main = settings_window_widget
+        self.context = None
 
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(20, 20, 20, 20)
@@ -53,9 +55,7 @@ class SettingsView(QWidget):
         self.font_size_label.setAlignment(QtCore.Qt.AlignLeft)
 
         self.font_size_value = QLineEdit()
-        self.font_size_value.setText(Database().get_value("text_size", "13"))
         self.font_size_value.setInputMask("D9")
-        self.font_size_value.textChanged.connect(self.apply_font_size)
         page.addWidget(self.font_size_label, 0, 0)
         page.addWidget(self.font_size_value, 0, 1)
 
@@ -65,8 +65,6 @@ class SettingsView(QWidget):
         self.color_theme_picker = QComboBox()
         self.color_theme_picker.insertItem(0, "Light")
         self.color_theme_picker.insertItem(1, "Dark")
-        self.color_theme_picker.setCurrentIndex(0)
-        self.color_theme_picker.currentIndexChanged.connect(self.change)
         page.addWidget(color_theme_label, 0, 3)
         page.addWidget(self.color_theme_picker, 0, 4)
 
@@ -76,8 +74,6 @@ class SettingsView(QWidget):
         self.editor_mode_picker = QComboBox()
         self.editor_mode_picker.insertItem(0, "Normal")
         self.editor_mode_picker.insertItem(1, "Focus")
-        self.editor_mode_picker.setCurrentIndex(0)
-        self.editor_mode_picker.currentIndexChanged.connect(self.change)
         page.addWidget(editor_mode_label, 1, 3)
         page.addWidget(self.editor_mode_picker, 1, 4)
 
@@ -91,18 +87,37 @@ class SettingsView(QWidget):
         self.main.setLayout(main_layout)
         self.main.hide()
 
-    def apply_font_size(self):
+    def load_context_values(self):
+        self.font_size_value.setText(str(self.context.text_size))
+
+        if self.context.color_theme == EditorTheme.Light:
+            self.color_theme_picker.setCurrentIndex(0)
+        else:
+            self.color_theme_picker.setCurrentIndex(1)
+
+    def get_font_size(self):
         size = self.font_size_value.text()
         if size == "" or size =="0":
             pt = 1
         else:
             pt = int(size)
+        return pt
 
-        Database().store_value("text_size", pt) # todo: remove. context only. save on quit or on schedule
-        self.main.parent().update_font_size()
+    def get_color_theme(self):
+        if self.color_theme_picker.currentIndex() == 0:
+            return EditorTheme.Light
+        else:
+            return EditorTheme.Dark
     
     def close(self):
+        self.update()
+        self.main.parent().update_params()
         self.main.hide()
 
-    def change(self, id):
-        print(id)
+    def setup(self, local_context):
+        self.context = local_context
+        self.load_context_values()
+
+    def update(self):
+        self.context.text_size = self.get_font_size()
+        self.context.color_theme = self.get_color_theme()

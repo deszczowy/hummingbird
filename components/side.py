@@ -16,6 +16,7 @@ class Editor(QWidget):
         self.editor = QTextEdit()
         self.layout = QVBoxLayout()
         self.stack()
+        self.font_size_pt = 1
 
     def stack(self):
         self.layout.addWidget(self.editor)
@@ -45,11 +46,14 @@ class Editor(QWidget):
             Notes().get_text(
                 folder, self.component
             ))
+        self.set_font_size(self.font_size_pt) #ugh... todo
+        
     
     def setup(self, font_size):
         self.set_font_size(font_size)
 
-    def set_font_size(self, size):
+    def set_font_size(self, size): #todo
+        self.font_size_pt = size
         currentTextCursor = self.editor.textCursor()
         isModified = self.editor.document().isModified()
         self.editor.selectAll()

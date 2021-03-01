@@ -206,6 +206,7 @@ class MainWindow(QMainWindow):
         if self.settingsWindow.isVisible():
             self.settingsWindow.hide()
         else:
+            self.settings.setup(self.context)
             self.settingsWindow.show()
 
     def action_switch_editor_theme(self):
@@ -230,7 +231,7 @@ class MainWindow(QMainWindow):
 
     def build_settings_dialog(self):
         self.settingsWindow = QWidget(self)
-        settings = SettingsView(self.settingsWindow)
+        self.settings = SettingsView(self.settingsWindow)
         self.resizeEvent(None)
 
     def build_info_dialog(self):
@@ -248,9 +249,17 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(800, 600)
         self.setWindowTitle(self.version.app_name())
 
-        self.set_editor_theme()
+        self.update_params()
         self.set_icon()
         self.set_geometry()
+
+    def update_params(self):
+        self.set_editor_font()
+        self.set_editor_theme()
+
+    def set_editor_font(self):
+        self.notepad.setup(self.context.text_size)
+        self.sidenote.setup(self.context.text_size)
 
     def set_editor_theme(self):
         self.setStyleSheet(self.stylist.get_style_sheet(self.context.color_theme))
@@ -368,41 +377,6 @@ class MainWindow(QMainWindow):
         if margin != self.marginWidth:
             self.mainPage.setViewportMargins(margin, 20, margin, 20)
             self.marginWidth = margin
-
-
-
-
-
-
-
-
-    # events {
-    
-
-
-    # }
-
-    #def load_folder(self, folder): # should be switch folder method
-    #    if folder != self.context.source_folder:
-    #        self.action_save()
-    #        db = Database()
-    #        db.store_value("folder_opened", folder)
-    #        db.store_value("folder_source", "LOCAL")
-    #        self.context.source_folder = folder
-    #        self.load_notes_contents()
-
-    # status {
-
-
-    # settings {
-
-    def update_font_size(self):
-        pt = int(Database().get_value("text_size", "13"))
-
-        self.notepad.setup(pt)
-        self.sidenote.setup(pt)
-
-    # }
 
     # info dialog {
 
