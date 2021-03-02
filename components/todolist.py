@@ -24,17 +24,19 @@ class ToDoList(QWidget):
         self.form = QVBoxLayout()
         self.buttons = QHBoxLayout()
 
+        self.add = QPushButton("Add")
+        self.add.clicked.connect(self.action_add)
+
         self.label = QLineEdit()
         self.label.setPlaceholderText("new task name")
+        self.label.returnPressed.connect(self.add.click)
+
         self.priority = QComboBox()
         self.priority.insertItem(0, "Low")
         self.priority.insertItem(1, "Medium")
         self.priority.insertItem(2, "High")
         self.priority.insertItem(3, "Critical")
         self.priority.setCurrentIndex(1)
-        
-        self.add = QPushButton("Add")
-        self.add.clicked.connect(self.action_add)
 
         self.stack()
 
