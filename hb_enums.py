@@ -1,9 +1,8 @@
 from enum import (Enum, IntEnum)
 
 class ActivePanel(Enum):
-    Nothing = 0
-    Options = 1
-    Info = 2
+    Options = 0
+    Info = 1
 
 class EditorMode(Enum):
     Normal = 0

@@ -27,7 +27,7 @@ from hb_dir import Directory
 from hb_db import Database
 from style.style import Stylist
 
-from dialogs.info.window import InfoWindow
+from dialogs.dialog import *
 from dialogs.settings.window import SettingsView
 from dialogs.switch.window import FolderSwitch
 from classes.context import *
@@ -45,8 +45,8 @@ class MainWindow(QMainWindow):
         self.create_backend()
         self.create_shortcuts()
         self.build_ui()
-        self.build_dialogs()
         self.window_setup()
+        self.build_dialogs()
         self.load_folder()
         self.show_window()
 
@@ -62,7 +62,6 @@ class MainWindow(QMainWindow):
         self.layout = QVBoxLayout()
 
         # external windows
-        self.infoWindow = None
         self.settingsWindow = None
         self.folderSwitch = None
 
@@ -87,7 +86,6 @@ class MainWindow(QMainWindow):
     def create_flags(self):
         # enums
         self.editorMode = EditorMode.Normal
-        self.activePanel = ActivePanel.Nothing
         # logic
         self.wasMaximized = False
 
@@ -197,10 +195,7 @@ class MainWindow(QMainWindow):
             self.folderSwitch.show()
     
     def action_toggle_info_window(self):
-        if self.infoWindow.isVisible():
-            self.infoWindow.hide()
-        else:
-            self.infoWindow.show()
+        self.dialog.show_dialog(ActivePanel.Info)
 
     def action_toggle_settings_window(self):
         if self.settingsWindow.isVisible():
@@ -225,18 +220,16 @@ class MainWindow(QMainWindow):
 
     # dialogs
     def build_dialogs(self):
+        self.dialogWidget = QWidget(self)
+        self.dialog = Dialog(self.dialogWidget)
+        self.dialog.hide()
+
         self.build_settings_dialog()
-        self.build_info_dialog()
         self.build_folder_switch_dialog()
 
     def build_settings_dialog(self):
         self.settingsWindow = QWidget(self)
         self.settings = SettingsView(self.settingsWindow)
-        self.resizeEvent(None)
-
-    def build_info_dialog(self):
-        self.infoWindow = QWidget(self)
-        info = InfoWindow(self.infoWindow)
         self.resizeEvent(None)
 
     def build_folder_switch_dialog(self):
@@ -341,12 +334,12 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event):
         if self.editorMode == EditorMode.Focus:
             self.set_focus_mode_margins()
-        if not (self.infoWindow is None):
-            self.resize_info_panel()
         if not (self.settingsWindow is None):
             self.resize_settings_panel()
         if not (self.folderSwitch is None):
             self.resize_folder_switch()
+
+        self.dialog.resize()
 
     def closeEvent(self, event):
         self.save_window_params()
@@ -377,19 +370,6 @@ class MainWindow(QMainWindow):
         if margin != self.marginWidth:
             self.mainPage.setViewportMargins(margin, 20, margin, 20)
             self.marginWidth = margin
-
-    # info dialog {
-
-
-    def resize_info_panel(self):
-        max_width_ip = 700
-        max_height_ip = 500
-
-        left_shift = int((self.width() - max_width_ip) /2) 
-        top_shift = int((self.height() - max_height_ip) /2)
-
-        self.infoWindow.setGeometry(left_shift, top_shift, max_width_ip, max_height_ip)
-    # }
 
     # settings dialog {
 

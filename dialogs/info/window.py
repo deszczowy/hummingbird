@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
 from hb_dir import Directory
 from dialogs.info.content import *
 
-class InfoWindow:
+class Info:
 
     def __init__(self, info_window_widget):
         infoLayout = QVBoxLayout()
@@ -36,5 +36,4 @@ class InfoWindow:
         infoLayout.addStretch()
 
         info_window_widget.setLayout(infoLayout)
-        info_window_widget.hide()
     
