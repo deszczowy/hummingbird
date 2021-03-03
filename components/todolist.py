@@ -20,6 +20,8 @@ class ToDoList(QWidget):
         self.layout = QVBoxLayout()
         self.list = QListView()
         self.list.setWordWrap(True)
+        self.list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.list.verticalScrollBar().setSingleStep(5)
 
         self.form = QVBoxLayout()
         self.buttons = QHBoxLayout()
