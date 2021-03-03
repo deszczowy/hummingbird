@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
 
 from hb_enums import *
 from dialogs.info.window import *
+from dialogs.settings.window import * # todo: do something with those imports...
 
 class Dialog(QWidget):
 
@@ -16,14 +17,16 @@ class Dialog(QWidget):
         super(Dialog, self).__init__(parent)
 
         self.root = parent
+        self.active = ActivePanel.Info
+
         #self.root.setStyleSheet("border: 1px solid red;")
 
         self.create_info_page()
+        self.create_settings_page()
 
         self.pages = QTabWidget()
-        page2 = QWidget()
         self.pages.addTab(self.info, "Info")
-        self.pages.addTab(page2, "Page2")
+        self.pages.addTab(self.settings, "Settings")
 
         layout = QVBoxLayout()
         layout.setSpacing(0)
@@ -43,7 +46,11 @@ class Dialog(QWidget):
 
     def create_info_page(self):
         self.info = QWidget(self)
-        info_obj = Info(self.info)
+        self.info_obj = Info(self.info)
+
+    def create_settings_page(self):
+        self.settings = QWidget(self)
+        self.settings_obj = Settings(self.settings)
 
     def resize(self):
         width = 700
@@ -53,3 +60,9 @@ class Dialog(QWidget):
         top = int((self.root.parent().height() - height) /2)
 
         self.root.setGeometry(left, top, width, height)
+
+    def setup(self, context):
+        self.settings_obj.setup(context)
+
+    def hide_dialog(self):
+        self.root.hide()

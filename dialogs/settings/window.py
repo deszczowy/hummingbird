@@ -10,11 +10,11 @@ from hb_db import Database
 from hb_dir import Directory
 from hb_enums import *
 
-class SettingsView(QWidget):
+class Settings(QWidget):
 
     def __init__(self, settings_window_widget):
 
-        super(SettingsView, self).__init__(settings_window_widget)
+        super(Settings, self).__init__(settings_window_widget)
 
         self.main = settings_window_widget
         self.context = None

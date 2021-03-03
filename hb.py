@@ -28,7 +28,6 @@ from hb_db import Database
 from style.style import Stylist
 
 from dialogs.dialog import *
-from dialogs.settings.window import SettingsView
 from dialogs.switch.window import FolderSwitch
 from classes.context import *
 from classes.timer import *
@@ -62,7 +61,6 @@ class MainWindow(QMainWindow):
         self.layout = QVBoxLayout()
 
         # external windows
-        self.settingsWindow = None
         self.folderSwitch = None
 
     def create_context(self):
@@ -152,6 +150,7 @@ class MainWindow(QMainWindow):
         self.shortcutSwitch.activated.connect(self.action_toggle_folder_switch)
         self.shortcutInfo.activated.connect(self.action_toggle_info_window)
         self.shortcutSetup.activated.connect(self.action_toggle_settings_window)
+        self.shortcutHide.activated.connect(self.action_hide_dialog)
 
         self.shortcutTheme.activated.connect(self.action_switch_editor_theme)
         self.shortcutMode.activated.connect(self.action_switch_editor_mode)
@@ -198,11 +197,11 @@ class MainWindow(QMainWindow):
         self.dialog.show_dialog(ActivePanel.Info)
 
     def action_toggle_settings_window(self):
-        if self.settingsWindow.isVisible():
-            self.settingsWindow.hide()
-        else:
-            self.settings.setup(self.context)
-            self.settingsWindow.show()
+        self.dialog.setup(self.context)
+        self.dialog.show_dialog(ActivePanel.Options)
+    
+    def action_hide_dialog(self):
+        self.dialog.hide_dialog()
 
     def action_switch_editor_theme(self):
         if self.context.color_theme == EditorTheme.Dark:
@@ -224,13 +223,7 @@ class MainWindow(QMainWindow):
         self.dialog = Dialog(self.dialogWidget)
         self.dialog.hide()
 
-        self.build_settings_dialog()
         self.build_folder_switch_dialog()
-
-    def build_settings_dialog(self):
-        self.settingsWindow = QWidget(self)
-        self.settings = SettingsView(self.settingsWindow)
-        self.resizeEvent(None)
 
     def build_folder_switch_dialog(self):
         self.folderSwitch = QWidget(self)
@@ -334,8 +327,6 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event):
         if self.editorMode == EditorMode.Focus:
             self.set_focus_mode_margins()
-        if not (self.settingsWindow is None):
-            self.resize_settings_panel()
         if not (self.folderSwitch is None):
             self.resize_folder_switch()
 
@@ -370,21 +361,6 @@ class MainWindow(QMainWindow):
         if margin != self.marginWidth:
             self.mainPage.setViewportMargins(margin, 20, margin, 20)
             self.marginWidth = margin
-
-    # settings dialog {
-
-
-    def resize_settings_panel(self):
-        max_width_ip = 700
-        max_height_ip = 500
-
-        left_shift = int((self.width() - max_width_ip) /2) 
-        top_shift = int((self.height() - max_height_ip) /2)
-
-        self.settingsWindow.setGeometry(left_shift, top_shift, max_width_ip, max_height_ip)
-    # }
-
-
 
     # switch folder {
 
