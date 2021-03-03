@@ -28,7 +28,7 @@ from hb_db import Database
 from style.style import Stylist
 
 from dialogs.dialog import *
-from dialogs.switch.window import FolderSwitch
+from dialogs.switch import *
 from classes.context import *
 from classes.timer import *
 from components.side import *

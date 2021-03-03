@@ -31,10 +31,8 @@ class Settings(QWidget):
 
         # buttons
 
-        buttons = QWidget()
         buttons_layout = QHBoxLayout()
-        buttons.setLayout(buttons_layout)
-        button = QPushButton("OK")
+        button = QPushButton("Ok")
         button.clicked.connect(self.close)
         buttons_layout.addStretch()
         buttons_layout.addWidget(button)
@@ -82,10 +80,10 @@ class Settings(QWidget):
         
         main_layout.addWidget(icon)
         main_layout.addLayout(page)
-        main_layout.addWidget(buttons)
+        main_layout.addLayout(buttons_layout)
 
         self.main.setLayout(main_layout)
-        self.main.hide()
+        #self.main.hide()
 
     def load_context_values(self):
         self.font_size_value.setText(str(self.context.text_size))
@@ -111,8 +109,8 @@ class Settings(QWidget):
     
     def close(self):
         self.update()
-        self.main.parent().update_params()
-        self.main.hide()
+        self.main.parent().parent().parent().parent().update_params()
+        self.main.parent().parent().parent().hide()
 
     def setup(self, local_context):
         self.context = local_context

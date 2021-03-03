@@ -3,15 +3,18 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import QKeySequence, QPixmap
 
 from PyQt5.QtWidgets import (
-    QVBoxLayout, QLabel
+    QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 )
 
 from hb_dir import Directory
-from dialogs.info.content import *
+from dialogs.info_content import *
 
 class Info:
 
     def __init__(self, info_window_widget):
+
+        self.main = info_window_widget
+
         infoLayout = QVBoxLayout()
         infoLayout.setContentsMargins(20, 20, 20, 20)
         
@@ -30,10 +33,22 @@ class Info:
         shortcuts = QLabel()
         shortcuts.setText(shortcuts_information)
 
+        # buttons
+
+        buttons_layout = QHBoxLayout()
+        button = QPushButton("Ok")
+        button.clicked.connect(self.close)
+        buttons_layout.addStretch()
+        buttons_layout.addWidget(button)
+
         infoLayout.addWidget(icon)
         infoLayout.addWidget(about)
         infoLayout.addWidget(shortcuts)
         infoLayout.addStretch()
+        infoLayout.addLayout(buttons_layout)
 
-        info_window_widget.setLayout(infoLayout)
+        self.main.setLayout(infoLayout)
+
+    def close(self):
+        self.main.parent().parent().parent().hide()
     

@@ -8,8 +8,8 @@ from PyQt5.QtWidgets import (
 )
 
 from hb_enums import *
-from dialogs.info.window import *
-from dialogs.settings.window import * # todo: do something with those imports...
+from dialogs.info import *
+from dialogs.settings import * # todo: do something with those imports...
 
 class Dialog(QWidget):
 
@@ -19,12 +19,13 @@ class Dialog(QWidget):
         self.root = parent
         self.active = ActivePanel.Info
 
-        #self.root.setStyleSheet("border: 1px solid red;")
+        self.root.setStyleSheet("border: 1px solid red;")
 
         self.create_info_page()
         self.create_settings_page()
 
         self.pages = QTabWidget()
+        self.pages.tabBar().hide()
         self.pages.addTab(self.info, "Info")
         self.pages.addTab(self.settings, "Settings")
 
@@ -66,3 +67,6 @@ class Dialog(QWidget):
 
     def hide_dialog(self):
         self.root.hide()
+
+    def update_params(self):
+        self.root.parent().update_params()
