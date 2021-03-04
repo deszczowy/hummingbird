@@ -75,11 +75,15 @@ class ToDoList(QWidget):
 
     def get_index_of_priority_to_insert(self, priority):
         p = int(priority)
-        for idx in range(0, self.list.model().rowCount()):
+        c = self.list.model().rowCount()
+
+        # print("inserted priority = %d" % p)
+
+        for idx in range(0, c):
             item = self.list.model().item(idx)
             if int(item.priority) <= p:
                 return idx
-        return 0
+        return c
 
     def save(self, folder):
         model = self.list.model()

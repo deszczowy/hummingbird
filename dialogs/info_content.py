@@ -1,6 +1,6 @@
 header_information = """
     This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
-    Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
+    Fabulous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
     """
 
 shortcuts_information = """
