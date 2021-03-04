@@ -10,12 +10,13 @@ shortcuts_information = """
     <br />
     F2 - Focus on main note<br />
     F3 - Focus on side note<br />
+    F4 - Focus on tasks list<br />
     <br />
     F7 - Switch between light and dark theme<br />
     F8 - Switch between normal and focus mode<br />
     F11 - Switch to fullscreen<br />
     <br />
-    F4 - select notebook
+    F5 - select notebook
     <br />
     Ctrl+S - Save all notebooks
     """

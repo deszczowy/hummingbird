@@ -37,7 +37,7 @@ class StatusBar(QWidget):
         self.messages.setAlignment(QtCore.Qt.AlignRight)
 
     def get_info(self):
-        return "F1:Info   F4:Switch notebooks   F9:Settings"
+        return "F1:Info   F5:Switch notebooks   F9:Settings"
 
     def publish(self, message):
         self.messages.setText(message + " ") # with margin

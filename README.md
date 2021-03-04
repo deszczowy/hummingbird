@@ -30,7 +30,8 @@ You can work with Hummingbird using only keyboard. Available shortcuts are liste
 - `F1`: show info panel
 - `F2`: focus on main note
 - `F3`: focus on side note
-- `F4`: switch notebooks
+- `F4`: focus on tasks list
+- `F5`: switch notebooks
 - `F7`: switch between light and dark theme
 - `F8`: switch between normal and focus mode of main editor
 - `F9`: show settings panel

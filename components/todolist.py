@@ -109,3 +109,6 @@ class ToDoList(QWidget):
             else:
                 i += 1
             go_on = i < self.list.model().rowCount()
+
+    def focus(self):
+        self.list.setFocus()

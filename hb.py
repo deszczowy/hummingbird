@@ -67,7 +67,8 @@ class MainWindow(QMainWindow):
         self.shortcutInfo = QShortcut(QKeySequence("F1"), self)
         self.shortcutMain = QShortcut(QKeySequence("F2"), self)
         self.shortcutSide = QShortcut(QKeySequence("F3"), self)
-        self.shortcutSwitch = QShortcut(QKeySequence("F4"), self)
+        self.shortcutTasks = QShortcut(QKeySequence("F4"), self)
+        self.shortcutSwitch = QShortcut(QKeySequence("F5"), self)
         self.shortcutTheme = QShortcut(QKeySequence("F7"), self)
         self.shortcutMode = QShortcut(QKeySequence("F8"), self)
         self.shortcutSetup = QShortcut(QKeySequence("F9"), self)
@@ -110,17 +111,17 @@ class MainWindow(QMainWindow):
         desktop = QWidget()
         desktop_container = QHBoxLayout()
 
-        side_tabs = QTabWidget()
-        side_tabs.addTab(self.sidenote, "Notes")
-        side_tabs.addTab(self.todolist, "Tasks")
-        side_tabs.setFixedWidth(300)
+        self.side_tabs = QTabWidget()
+        self.side_tabs.addTab(self.sidenote, "Notes")
+        self.side_tabs.addTab(self.todolist, "Tasks")
+        self.side_tabs.setFixedWidth(300)
 
         desktop_container.addWidget(self.notepad) # separate class
-        desktop_container.addWidget(side_tabs)
+        desktop_container.addWidget(self.side_tabs)
         desktop.setLayout(desktop_container)
         
         desktop.setContentsMargins(0, 0, 0, 0)
-        side_tabs.setContentsMargins(0, 0, 0, 0)
+        self.side_tabs.setContentsMargins(0, 0, 0, 0)
         self.layout.setContentsMargins(0, 0, 0, 0)
         desktop_container.setContentsMargins(0, 0, 0, 0)
         desktop_container.setSpacing(0)
@@ -139,6 +140,7 @@ class MainWindow(QMainWindow):
 
         self.shortcutMain.activated.connect(self.action_focus_notepad)
         self.shortcutSide.activated.connect(self.action_focus_sidenote)
+        self.shortcutTasks.activated.connect(self.action_focus_tasks)
 
         self.shortcutSwitch.activated.connect(self.action_toggle_folder_switch)
         self.shortcutInfo.activated.connect(self.action_toggle_info_window)
@@ -178,7 +180,12 @@ class MainWindow(QMainWindow):
         self.notepad.focus()
     
     def action_focus_sidenote(self):
+        self.side_tabs.setCurrentIndex(0)
         self.sidenote.focus()
+
+    def action_focus_tasks(self):
+        self.side_tabs.setCurrentIndex(1)
+        self.todolist.focus()
 
     def action_toggle_folder_switch(self):
         if self.folderSwitch.isVisible():
