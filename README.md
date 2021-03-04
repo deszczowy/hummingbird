@@ -65,6 +65,11 @@ The beautiful Hummingbird logo is made by [Freepik](https://www.flaticon.com/aut
 - App information now has special separate window
 
 #### Ver. 0.8
-- Notebook now has a task list
 - Focus mode setting is stored into database
 - Application settings dialog now has mode and theme switches
+- Notebook now has a task list:
+
+![Hummingbird task list view](/res/screenshot_02.png)
+
+#### Ver. 0.9
+_tbc_
