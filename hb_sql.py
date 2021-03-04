@@ -5,19 +5,15 @@ class Sql():
     @staticmethod
     def create_db(sep):
         return """
-            CREATE TABLE IF NOT EXISTS notebook (
-                id INT PRIMARY KEY NOT NULL,
-                folder INT NOT NULL,
-                content TEXT NOT NULL,
-                version INT NOT NULL,
-                save_time TEXT NOT NULL,
-                main_page INT NOT NULL,
-                archived INT NOT NULL
-            );
-        """ + sep + """
-            CREATE TABLE IF NOT EXISTS defaults (
-                id INT PRIMARY KEY NOT NULL,
-                version INT NOT NULL
+            CREATE TABLE IF NOT EXISTS "notebook" (
+                "id"	INT NOT NULL,
+                "folder"	INT NOT NULL,
+                "sleeve"	INT NOT NULL,
+                "content"	TEXT NOT NULL,
+                "save_time"	TEXT NOT NULL,
+                "version"	INT NOT NULL,
+                "archived"	INT NOT NULL,
+                PRIMARY KEY("id")
             );
         """ + sep + """
             CREATE TABLE IF NOT EXISTS dictionary (
@@ -30,17 +26,22 @@ class Sql():
                 label TEXT NOT NULL
             )
         """ + sep + """
-            INSERT INTO defaults (id, version) 
-               SELECT 1, 1 
-               WHERE NOT EXISTS(SELECT 1 FROM defaults WHERE id = 1);
-        """ + sep + """
             INSERT INTO dictionary (key, entry) 
-               SELECT 'db_version', '3'
+               SELECT 'db_version', '5'
                WHERE NOT EXISTS(SELECT 1 FROM dictionary WHERE key = 'db_version');
         """ + sep + """
             INSERT INTO folder (id, label)
                 SELECT 1, 'default'
                 WHERE NOT EXISTS(SELECT 1 FROM folder WHERE id = 1);
+        """ + sep + """
+            CREATE TABLE IF NOT EXISTS task (
+                id INT PRIMARY KEY NOT NULL,
+                folder INT NOT NULL,
+                label TEXT NOT NULL,
+                priority INT NOT NULL,
+                stamp TEXT NOT NULL,
+                done INT NOT NULL
+            );
         """
 
     @staticmethod
@@ -124,4 +125,6 @@ class Sql():
             "done"	INTEGER NOT NULL,
             PRIMARY KEY("id")
         );
+        """ + sep + """
+        DROP TABLE defaults;
         """
