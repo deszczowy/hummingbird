@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
 #from hb_dir import Directory
 
 from hb_notes import Notes
-from hb_enums import Component
+from hb_enums import *
 
 class Editor(QWidget):
     def __init__(self, parent, component_def):
@@ -71,10 +71,33 @@ class SideNotes(Editor):
         super(SideNotes, self).__init__(parent, Component.SideNotes)
 
 class Notepad(Editor):
-
+    
     def __init__(self, parent):
         super(Notepad, self).__init__(parent, Component.Notepad)
+        self.margin_width = 0
+        self.current_mode = EditorMode.Normal
 
+    def setup_mode(self, context):
+        self.current_mode = context.editor_mode
+        
+        if self.current_mode == EditorMode.Focus:
+            self.set_focus_mode_margins()
+        else: # normal
+            self.editor.setViewportMargins(0, 0, 0, 0)
+            self.margin_width = 0
+            #self.set_editor_theme()
+
+    def set_focus_mode_margins(self):
+        margin = self.parent().parent().width() - 300 - 750
+        margin = round(margin / 2)
+
+        if margin < 0:
+            margin = 0
+        if margin != self.margin_width:
+            self.editor.setViewportMargins(margin, 20, margin, 20)
+            self.margin_width = margin
     
-    
+    def refresh(self):
+        if self.current_mode == EditorMode.Focus:
+            self.set_focus_mode_margins()
     

@@ -49,11 +49,6 @@ class MainWindow(QMainWindow):
         self.load_folder()
         self.show_window()
 
-        #
-        # code to reorganize
-        
-        self.marginWidth = 0
-
     # main app creators
     def create_main_components(self):
         # main window
@@ -82,8 +77,6 @@ class MainWindow(QMainWindow):
         self.bind_shortcuts()
 
     def create_flags(self):
-        # enums
-        self.editorMode = EditorMode.Normal
         # logic
         self.wasMaximized = False
 
@@ -211,10 +204,10 @@ class MainWindow(QMainWindow):
         self.set_editor_theme()
 
     def action_switch_editor_mode(self):
-        if self.editorMode == EditorMode.Focus:
-            self.editorMode = EditorMode.Normal
+        if self.context.editor_mode == EditorMode.Focus:
+            self.context.editor_mode = EditorMode.Normal
         else:
-            self.editorMode = EditorMode.Focus
+            self.context.editor_mode = EditorMode.Focus
         self.set_editor_mode()
 
     # dialogs
@@ -235,13 +228,14 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(800, 600)
         self.setWindowTitle(self.version.app_name())
 
-        self.update_params()
         self.set_icon()
         self.set_geometry()
+        self.update_params()
 
     def update_params(self):
         self.set_editor_font()
         self.set_editor_theme()
+        self.set_editor_mode()
 
     def set_editor_font(self):
         self.notepad.setup(self.context.text_size)
@@ -249,6 +243,9 @@ class MainWindow(QMainWindow):
 
     def set_editor_theme(self):
         self.setStyleSheet(self.stylist.get_style_sheet(self.context.color_theme))
+
+    def set_editor_mode(self):
+        self.notepad.setup_mode(self.context)
 
     def set_icon(self):
         self.setWindowIcon(QtGui.QIcon(self.directory.get_resource_dir() + 'icon.png'))
@@ -325,8 +322,7 @@ class MainWindow(QMainWindow):
 
     # events
     def resizeEvent(self, event):
-        if self.editorMode == EditorMode.Focus:
-            self.set_focus_mode_margins()
+        self.notepad.refresh()
         if not (self.folderSwitch is None):
             self.resize_folder_switch()
 
@@ -344,23 +340,9 @@ class MainWindow(QMainWindow):
     ## dragons below
 
    
-    def set_editor_mode(self):
-        if self.editorMode == EditorMode.Focus:
-            self.set_focus_mode_margins()
-        else: # normal
-            self.mainPage.setViewportMargins(0, 0, 0, 0)
-            self.marginWidth = 0
-            self.set_editor_theme()
-    
-    def set_focus_mode_margins(self):
-        margin = self.width() - self.sideTabs.width() - 750
-        margin = round(margin / 2)
 
-        if margin < 0:
-            margin = 0
-        if margin != self.marginWidth:
-            self.mainPage.setViewportMargins(margin, 20, margin, 20)
-            self.marginWidth = margin
+    
+
 
     # switch folder {
 

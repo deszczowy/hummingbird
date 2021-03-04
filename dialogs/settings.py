@@ -93,6 +93,11 @@ class Settings(QWidget):
         else:
             self.color_theme_picker.setCurrentIndex(1)
 
+        if self.context.editor_mode == EditorMode.Normal:
+            self.editor_mode_picker.setCurrentIndex(0)
+        else:
+            self.editor_mode_picker.setCurrentIndex(1)
+
     def get_font_size(self):
         size = self.font_size_value.text()
         if size == "" or size =="0":
@@ -107,6 +112,12 @@ class Settings(QWidget):
         else:
             return EditorTheme.Dark
     
+    def get_editor_mode(self):
+        if self.editor_mode_picker.currentIndex() == 0:
+            return EditorMode.Normal
+        else:
+            return EditorMode.Focus
+
     def close(self):
         self.update()
         self.main.parent().parent().parent().parent().update_params()
@@ -119,3 +130,4 @@ class Settings(QWidget):
     def update(self):
         self.context.text_size = self.get_font_size()
         self.context.color_theme = self.get_color_theme()
+        self.context.editor_mode = self.get_editor_mode()

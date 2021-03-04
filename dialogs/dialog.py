@@ -19,7 +19,7 @@ class Dialog(QWidget):
         self.root = parent
         self.active = ActivePanel.Info
 
-        self.root.setStyleSheet("border: 1px solid red;")
+        #self.root.setStyleSheet("border: 1px solid red;")
 
         self.create_info_page()
         self.create_settings_page()

@@ -6,6 +6,7 @@ from hb_enums import *
 class Context:
 
     color_theme = EditorTheme.Light
+    editor_mode = EditorMode.Normal
     
     text_size = 13
 
@@ -22,17 +23,25 @@ class Context:
     #def __init__(self):
 
     def load(self):
-        self.read_theme_from_db()
+        self.read_theme()
+        self.read_mode()
         self.read_text_properties()
         self.read_notes_params()
         self.read_window_params()
 
-    def read_theme_from_db(self):
+    def read_theme(self):
         theme = Database().get_value("theme", "L")
         if theme == "D":
             self.color_theme = EditorTheme.Dark
         else:
             self.color_theme = EditorTheme.Light
+    
+    def read_mode(self):
+        mode = Database().get_value("mode", "N")
+        if mode == "F":
+            self.editor_mode = EditorMode.Focus
+        else:
+            self.editor_mode = EditorMode.Normal
 
     def read_text_properties(self):
         self.text_size = int(Database().get_value("text_size", "13"))
@@ -57,6 +66,9 @@ class Context:
 
         value = "D" if self.color_theme == EditorTheme.Dark else "L"
         db.store_value("theme", value)
+
+        value = "F" if self.editor_mode == EditorMode.Focus else "N"
+        db.store_value("mode", value)
 
         value = "LOCAL" if self.is_source_local else "PATH"
         db.store_value("folder_source", value)
