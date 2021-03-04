@@ -145,7 +145,8 @@ class Database():
         updaters = {
             1: Sql.update_to_2(separator),
             2: Sql.update_to_3(separator),
-            3: Sql.update_to_4(separator)
+            3: Sql.update_to_4(separator),
+            4: Sql.update_to_5(separator)
         }
 
         if difference == 1:

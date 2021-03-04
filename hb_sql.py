@@ -89,3 +89,39 @@ class Sql():
         """ + sep + """
         UPDATE dictionary SET entry = '4' WHERE key = 'db_version';
         """
+
+    @staticmethod
+    def update_to_5(sep):
+        return """
+        ALTER TABLE notebook RENAME TO notebookOLD;
+        """ + sep + """
+        CREATE TABLE "notebook" (
+            "id"	INT NOT NULL,
+            "folder"	INT NOT NULL,
+            "sleeve"	INT NOT NULL,
+            "content"	TEXT NOT NULL,
+            "save_time"	TEXT NOT NULL,
+            "version"	INT NOT NULL,
+            "archived"	INT NOT NULL,
+            PRIMARY KEY("id")
+        );
+        """ + sep + """
+        INSERT INTO notebook (id, folder, sleeve, content, save_time, version, archived) 
+        SELECT id, folder, 
+        CASE WHEN main_page = 1 THEN 0 ELSE 1 END,
+        content, save_time, version, archived FROM notebookOLD;
+        """ + sep + """
+        DROP TABLE notebookOLD;
+        """ + sep + """
+        UPDATE dictionary SET entry = '5' WHERE key = 'db_version';
+        """ + sep + """
+        CREATE TABLE "task" (
+            "id"	INTEGER,
+            "folder"	INTEGER NOT NULL,
+            "label"	TEXT NOT NULL,
+            "priority"	INTEGER NOT NULL,
+            "stamp"	TEXT NOT NULL,
+            "done"	INTEGER NOT NULL,
+            PRIMARY KEY("id")
+        );
+        """
