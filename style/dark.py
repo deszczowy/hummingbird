@@ -180,4 +180,10 @@ stylesheet_dark = """
         padding: 5px;
         font-family: mono;
     }
+
+    #Notepad
+    {
+        border: 0px;
+        border-right: 1px dotted #4D4D4D;
+    }
 """

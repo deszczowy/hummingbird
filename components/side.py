@@ -76,6 +76,7 @@ class Notepad(Editor):
         super(Notepad, self).__init__(parent, Component.Notepad)
         self.margin_width = 0
         self.current_mode = EditorMode.Normal
+        self.editor.setObjectName("Notepad")
 
     def setup_mode(self, context):
         self.current_mode = context.editor_mode
