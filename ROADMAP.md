@@ -1,11 +1,5 @@
 # Hummingbird Editor Roadmap
 
-## Version 0.8
-
-- mode and theme switches in settings panel
-- frame for full accessible app settings
-+ todo list next to sidenotes, stored in database
-
 ## Version 0.9
 
 - two notes direction (contexts), the main, which is database and 'projects' opened from files
@@ -32,6 +26,7 @@
 - snapshots of editing history
 - maybe switching to qtquick
 - notes history preview (maybe in tab on the main editor panel)
+- dialogs become modal
 
 ## Principles
 
