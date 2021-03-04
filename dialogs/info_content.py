@@ -1,6 +1,6 @@
 header_information = """
     This little notetaking app is created by <a href=\"https://github.com/deszczowy\">Deszczowy</a><br />
-    Fabolous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
+    Fabulous Hummingbird icon is made by <a href=\"https://www.flaticon.com/authors/freepik\">Freepik</a> from <a href=\"http://www.flaticon.com\">www.flaticon.com</a>
     """
 
 shortcuts_information = """
@@ -10,12 +10,13 @@ shortcuts_information = """
     <br />
     F2 - Focus on main note<br />
     F3 - Focus on side note<br />
+    F4 - Focus on tasks list<br />
     <br />
     F7 - Switch between light and dark theme<br />
     F8 - Switch between normal and focus mode<br />
     F11 - Switch to fullscreen<br />
     <br />
-    F4 - select notebook
+    F5 - select notebook
     <br />
     Ctrl+S - Save all notebooks
     """

@@ -2,9 +2,9 @@
 
 # Hummingbird Editor
 
-This is a little notebook, with two visible editors. First one for main long notes. Second one for easy accessible additional side notes.
+This is a little notebook, with two visible editors. First one for main long notes. Second one for easy accessible additional side notes. Notebook also contains a simple task list.
 
-Current version is `0.7`
+Current version is `0.8`
 
 ![Hummingbird main window](/res/screenshot_01.png)
 
@@ -14,13 +14,14 @@ You can run Hummingbird by downloading this repository and go with `python3 hb.p
 
 ## Features
 
-In this version there are two main features:
+In this version contains:
 
-- Two visible editors
+- Two editors
+- Task list
 - Autosave
-- Dark theme
+- Light / Dark theme
 - Focus mode
-- Multiple notebooks
+- Possibility of storing multiple notebooks
 
 ## Keyboard shortcuts
 
@@ -29,14 +30,15 @@ You can work with Hummingbird using only keyboard. Available shortcuts are liste
 - `F1`: show info panel
 - `F2`: focus on main note
 - `F3`: focus on side note
-- `F4`: switch notebooks
+- `F4`: focus on tasks list
+- `F5`: switch notebooks
 - `F7`: switch between light and dark theme
-- `F8`: switch between normal and focus editing mode
+- `F8`: switch between normal and focus mode of main editor
 - `F9`: show settings panel
-- `F10`: quit application with all notes saved
+- `F10`: save all notes and tasks, then quit application
 - `F11`: toggle fullscreen
-- `ESC`: hide bottom panels
-- `Ctrl+S`: Save all notes
+- `ESC`: hide dialogs
+- `Ctrl+S`: Save all notes immediately
 
 ## Development
 
@@ -61,3 +63,13 @@ The beautiful Hummingbird logo is made by [Freepik](https://www.flaticon.com/aut
 - Full screen mode
 - Now you can create and switch between multiple notebooks
 - App information now has special separate window
+
+#### Ver. 0.8
+- Focus mode setting is stored into database
+- Application settings dialog now has mode and theme switches
+- Notebook now has a task list:
+
+![Hummingbird task list view](/res/screenshot_02.png)
+
+#### Ver. 0.9
+_tbc_

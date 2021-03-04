@@ -1,4 +1,5 @@
 from PyQt5.QtSql import (QSqlDatabase, QSqlQuery)
+from PyQt5 import QtCore
 
 from hb_dir import Directory
 from hb_sql import Sql
@@ -11,7 +12,7 @@ class Database():
     def __init__(self):
         self.name = Directory().get_notes_dir() + "notebooks.db"
 
-    def create(self):
+    def create(self): # todo
         db = QSqlDatabase.addDatabase("QSQLITE")
         db.setDatabaseName(self.name)
 
@@ -26,83 +27,8 @@ class Database():
             sqlQuery.exec_(query)
 
         self.update()
-
-    def save_notebook(self, content, side, folder_id):
-        main_indicator = -1
-        if side:
-            self.archive_side_notebook(folder_id)
-            main_indicator = 0
-        else:
-            self.archive_main_notebook(folder_id)
-            main_indicator = 1
-
-        db = QSqlDatabase.database()
-        db.setDatabaseName(self.name)
-
-        if not db.open():
-            print("NOT OPEN :SAVE")
-            return False
-
-        query = QSqlQuery()
-        query.prepare(
-        """INSERT INTO notebook (id, folder, content, version, save_time, main_page, archived) values (
-            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
-            :folder,
-            :content,
-            (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE main_page = :mpage AND folder = :folder),
-            datetime('now','localtime'),
-            :mpage, 0
-        );""")
-
-        query.bindValue(":folder", folder_id)   
-        query.bindValue(":content", content)
-        query.bindValue(":mpage", main_indicator)
-        query.exec_()
-
-        self.remove_old_versions(main_indicator, folder_id)
-
-    def remove_old_versions(self, side, folder_id):
-        db = QSqlDatabase.database()
-        db.setDatabaseName(self.name)
-
-        if not db.open():
-            print("NOT OPEN: REMO")
-            return False
-        
-        query = QSqlQuery()
-        query.prepare("DELETE FROM notebook WHERE folder = :folder AND main_page = :side AND version <= (SELECT max(version) FROM notebook WHERE main_page = :side AND folder = :folder) -40;")
-        query.bindValue(":folder", folder_id)
-        query.bindValue(":side", side)
-        query.exec_()
-
-    def archive_main_notebook(self, folder_id):
-        db = QSqlDatabase.database()
-        db.setDatabaseName(self.name)
-
-        if not db.open():
-            print("NOT OPEN :ARCH M")
-            return False
-
-        query = QSqlQuery()
-        query.prepare("UPDATE notebook SET archived = 1 WHERE main_page = 1 AND folder = :folder")
-        query.bindValue(":folder", folder_id)
-        query.exec_()
-
-    def archive_side_notebook(self, folder_id):
-        db = QSqlDatabase.database()
-        db.setDatabaseName(self.name)
-
-        if not db.open():
-            print("NOT OPEN :ARCH S")
-            return False
-
-        query = QSqlQuery()
-        query.prepare("UPDATE notebook SET archived = 1 WHERE main_page = 0 AND folder = :folder")
-        query.bindValue(":folder", folder_id)
-        query.exec_()
-        
-
-    def get_main_content(self, folder_id):
+    
+    def get_text(self, folder, sleeve):
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
@@ -111,28 +37,93 @@ class Database():
             return False
 
         query = QSqlQuery()
-        query.prepare("SELECT content FROM notebook WHERE main_page = 1 AND archived = 0 AND folder = :folder")
-        query.bindValue(":folder", folder_id)
+        query.prepare("SELECT content FROM notebook WHERE sleeve = :sleeve AND archived = 0 AND folder = :folder")
+        query.bindValue(":folder", int(folder))
+        query.bindValue(":sleeve", int(sleeve))
         query.exec_()
         while query.next():
             return query.value(0)
         return ""
-        
-    def get_side_content(self, folder_id):
+
+
+#dragons 
+
+    def save_text(self, folder, sleeve, content):
+       
+        sleeve_id = int(sleeve)
+
+        query_text = """
+        INSERT INTO notebook (
+            id, 
+            folder, 
+            content, 
+            version, 
+            save_time, 
+            sleeve, 
+            archived
+        ) values (
+            (SELECT IFNULL(MAX(id),0) +1 FROM notebook), 
+            :folder,
+            :content,
+            (SELECT IFNULL(MAX(version),0) +1 FROM notebook WHERE sleeve = :sleeve AND folder = :folder),
+            datetime('now','localtime'),
+            :sleeve, 
+            0
+        );"""
+
         db = QSqlDatabase.database()
         db.setDatabaseName(self.name)
 
         if not db.open():
-            print("NOT OPEN :GET S")
+            print("NOT OPEN :SAVE NOTEBOOK")
+            return False
+
+        self.archive_text(folder, sleeve_id)
+
+        query = QSqlQuery()
+        query.prepare(query_text)
+
+        query.bindValue(":folder", folder)   
+        query.bindValue(":content", content)
+        query.bindValue(":sleeve", sleeve_id)
+        query.exec_()
+
+        self.remove_old_versions(sleeve_id, folder)
+
+    
+
+    def remove_old_versions(self, sleeve, folder):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN: REMO")
+            return False
+        
+        query = QSqlQuery()
+        query.prepare("""
+        DELETE FROM notebook WHERE 
+            folder = :folder 
+            AND sleeve = :sleeve 
+            AND version <= (SELECT max(version) FROM notebook WHERE sleeve = :sleeve AND folder = :folder) -40;"""
+        )
+        query.bindValue(":folder", folder)
+        query.bindValue(":sleeve", sleeve)
+        query.exec_()
+
+    def archive_text(self, folder, sleeve):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :ARCH")
             return False
 
         query = QSqlQuery()
-        query.prepare("SELECT content FROM notebook WHERE main_page = 0 AND archived = 0 AND folder = :folder")
-        query.bindValue(":folder", folder_id)
+        query.prepare("UPDATE notebook SET archived = 1 WHERE sleeve = :sleeve AND folder = :folder")
+        query.bindValue(":sleeve", sleeve)
+        query.bindValue(":folder", folder)
         query.exec_()
-        while query.next():
-            return query.value(0)
-        return ""
 
     def get_database_version(self):
         db = QSqlDatabase.database()
@@ -154,7 +145,8 @@ class Database():
         updaters = {
             1: Sql.update_to_2(separator),
             2: Sql.update_to_3(separator),
-            3: Sql.update_to_4(separator)
+            3: Sql.update_to_4(separator),
+            4: Sql.update_to_5(separator)
         }
 
         if difference == 1:
@@ -235,13 +227,42 @@ class Database():
         
         query = QSqlQuery()
         query.exec_("SELECT id, label FROM folder")
-
-        model = BasicItemModel()
+        
+        model = QStandardItemModel()
         while query.next():
-            item = QStandardItem(query.value(1))
+            item = FolderItem(query.value(1))
+            item.setSelectable(True)
+            item.setEditable(False)
             item.folder_id = query.value(0)
             model.appendRow(item)
 
+        return model
+
+    def get_task_model(self, folder):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :GET TASK")
+            return False
+
+        query = QSqlQuery()
+        query.prepare("SELECT id, label, priority, stamp FROM task WHERE folder = :folder AND done = 0 ORDER BY priority DESC, stamp DESC")
+        query.bindValue(":folder", folder)
+        query.exec()
+
+        model = QStandardItemModel()
+        while query.next():
+            item = ToDoItem()
+            item.setSelectable(True)
+            item.setEditable(False)
+            item.setCheckable(True)
+            item.id = int(query.value(0))
+            item.label = query.value(1)
+            item.priority = Priority(int(query.value(2)))
+            item.date = datetime.datetime.strptime(query.value(3),"%Y%m%d%H%M%S")
+            model.appendRow(item)
+        
         return model
 
     def insert_folder(self, folder_name):
@@ -273,4 +294,52 @@ class Database():
         query.prepare("UPDATE folder SET label = :label WHERE id = :folder;")
         query.bindValue(":label", new_name)
         query.bindValue(":folder", folder_id)
+        query.exec_()
+
+    def insert_task(self, folder, item):
+
+        done = 1 if item.checkState() == QtCore.Qt.Checked else 0
+
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :I TASK")
+            return False
+
+        query = QSqlQuery()
+        query.prepare("""
+            INSERT INTO task (
+                id, folder, label, priority, stamp, done
+            ) VALUES (
+                (SELECT IFNULL(MAX(id),0) +1 FROM task),
+                :folder,
+                :label,
+                :priority,
+                :stamp,
+                :done
+            );
+        """)
+        query.bindValue(":folder", folder)
+        query.bindValue(":label", item.label)
+        query.bindValue(":stamp", item.date)
+        query.bindValue(":priority", int(item.priority))
+        query.bindValue(":done", done)
+        query.exec_()
+
+        ask = QSqlQuery("SELECT IFNULL(MAX(id),1) FROM task")
+        while ask.next():
+            return int(ask.value(0))
+
+    def check_task(self, id):
+        db = QSqlDatabase.database()
+        db.setDatabaseName(self.name)
+
+        if not db.open():
+            print("NOT OPEN :U TASK")
+            return False
+        
+        query = QSqlQuery()
+        query.prepare("UPDATE task SET done = 1 WHERE id = :task")
+        query.bindValue(":task", id)
         query.exec_()

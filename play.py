@@ -6,9 +6,11 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QFrame, QMessageBox,
     QHBoxLayout, QVBoxLayout, QGridLayout, QSpacerItem,
     QTextEdit, QPushButton, QLabel, QSpinBox, 
-    QListView,
+    QListView, QTabWidget,
     QShortcut, QDesktopWidget, QSizePolicy
 )
+
+
 
 notebooks = [
    'Work',
@@ -64,6 +66,8 @@ def window():
    w.setLayout(g)   
    """
 
+
+   """
    # test window with list
    btn = QPushButton("Show a non-modal window")
    layout = QVBoxLayout(w)
@@ -97,6 +101,19 @@ def window():
    ### -dialog
 
    btn.clicked.connect(lambda: show_window(dlg))
+   """
+
+   tabs = QTabWidget()
+   lay = QVBoxLayout()
+   lay.addWidget(tabs)
+   w.setLayout(lay)
+
+   page1 = QWidget()
+   page2 = QWidget()
+
+   tabs.addTab(page1, "Page 1")
+   tabs.addTab(page2, "Page 2")
+   
 
    # Show window
    w.show()
