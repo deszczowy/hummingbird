@@ -61,16 +61,17 @@ class ToDoList(QWidget):
     #    if item.checkState() == QtCore.Qt.Checked:
 
     def action_add(self):
-        item = ToDoItem()
-        item.label = self.label.text()
-        item.date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        item.priority = Priority(self.priority.currentIndex())
-        item.setSelectable(True)
-        item.setEditable(False)
-        item.setCheckable(True)
-        idx = self.get_index_of_priority_to_insert(item.priority)
-        self.list.model().insertRow(idx, item)
-        self.label.setText("")
+        if self.label.text() != "":
+            item = ToDoItem()
+            item.label = self.label.text()
+            item.date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            item.priority = Priority(self.priority.currentIndex())
+            item.setSelectable(True)
+            item.setEditable(False)
+            item.setCheckable(True)
+            idx = self.get_index_of_priority_to_insert(item.priority)
+            self.list.model().insertRow(idx, item)
+            self.label.setText("")
 
     def get_index_of_priority_to_insert(self, priority):
         p = int(priority)
